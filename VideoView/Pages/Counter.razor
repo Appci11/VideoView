@@ -1,4 +1,8 @@
 ﻿@page "/counter"
+@using Newtonsoft.Json;
+@using VideoView.Models.Cat;
+
+@inject HttpClient client;
 
 <PageTitle>Counter</PageTitle>
 
@@ -8,11 +12,43 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<br />
+<br />
+
+<p>@text</p>
+
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private string text;
+
+    private async void IncrementCount()
     {
         currentCount++;
+
+        //var result3 = await client.GetStringAsync("https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats");
+        //var result = await client.GetAsync("https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats");
+        //Cat result2 = await client.GetFromJsonAsync<Cat>("https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats/katinc");
+        //var result = await client.GetFromJsonAsync<List<Cat>>("https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats");
+
+
+
+        Cat cat = new Cat();
+        cat.fields.name.stringValue = "VARDENIS";
+        //string ser = JsonConvert.SerializeObject(cat.fields);
+        var result = await client.PostAsJsonAsync($"https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats", new { fields = cat.fields });
+
+        //CatDocuments myDeserializedClass = JsonConvert.DeserializeObject<CatDocuments>(result3);
+
+        //List<Cat> katenai = myDeserializedClass.documents;
+
+        //Cat CC = katenai.FirstOrDefault(k => k.fields.name.stringValue == "vardenis");
+        //text = CC.name;
+
+        //Console.WriteLine("asd");
+
+        //text = "CCC";
+        //StateHasChanged();
+
     }
 }

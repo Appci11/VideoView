@@ -1,0 +1,76 @@
+﻿@page "/cat"
+@page "/cat/{id}"
+@using VideoView.Models.Cat;
+@using VideoView.Services.CatsService;
+
+@inject NavigationManager _navigationManager
+@inject ICatsService _catsService
+
+@if (Id == null)
+{
+    <PageTitle>New Cat</PageTitle>
+    <h3>Create a new cat</h3>
+}
+else
+{
+    <PageTitle>Edit Cat</PageTitle>
+    <h3>Edit Cat</h3>
+}
+
+<EditForm Model="cat" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="cat.fields.name.stringValue" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    @if (Id != null)
+    {
+        <button type="button" class=" padded-button btn btn-primary" @onclick="GoBack">Go Back</button>
+    }
+</EditForm>
+
+
+
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    Cat cat = new Cat();
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Create a new cat" : "Edit cat";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            cat = await _catsService.GetCatById(Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await _catsService.AddCat(cat);
+            _navigationManager.NavigateTo("/cats");
+        }
+        else
+        {
+            await _catsService.UpdateCat(cat);
+            _navigationManager.NavigateTo("/cats");
+        }
+    }
+
+    void GoBack()
+    {
+        _navigationManager.NavigateTo("/cats");
+    }
+}
