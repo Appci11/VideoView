@@ -1,6 +1,7 @@
 ﻿@page "/counter"
 @using Newtonsoft.Json;
 @using VideoView.Models.Cat;
+@using VideoView.Models.Dto;
 
 @inject HttpClient client;
 
@@ -33,10 +34,10 @@
 
 
 
-        Cat cat = new Cat();
-        cat.fields.name.stringValue = "VARDENIS";
+        //Cat cat = new Cat();
+        //cat.fields.name.stringValue = "VARDENIS";
         //string ser = JsonConvert.SerializeObject(cat.fields);
-        var result = await client.PostAsJsonAsync($"https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats", new { fields = cat.fields });
+        //var result = await client.PostAsJsonAsync($"https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats", new { fields = cat.fields });
 
         //CatDocuments myDeserializedClass = JsonConvert.DeserializeObject<CatDocuments>(result3);
 
@@ -45,7 +46,42 @@
         //Cat CC = katenai.FirstOrDefault(k => k.fields.name.stringValue == "vardenis");
         //text = CC.name;
 
-        //Console.WriteLine("asd");
+        string key = "AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo";
+
+        //UserRegisterDto dto = new UserRegisterDto();
+        //dto.email = "Userrr@user.user";
+        //dto.password = "UserUser11";
+        //dto.returnSecureToken = true;
+        //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1/accounts:signUp?key={key}", new
+        //{
+        //    email = "Petras@gmail.com",
+        //    password = "SLAPTASzodis",
+        //    returnSecureToken = true
+        //});
+
+    var result = await client.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={key}", new
+        {
+            email = "Petras@gmail.com",
+            password = "SLAPTASzodis",
+            returnSecureToken = true
+        });
+
+        //AuthUserDto dto = new AuthUserDto();
+        //dto.email = "Userrr@user.user";
+        //dto.password = "UserUser11";
+        //dto.returnSecureToken = true;
+        //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo", dto);
+
+
+
+        //UserRegisterDto dto = new UserRegisterDto();
+        //dto.email = "User@user.user";
+        //dto.password = "UserUser11";
+        //dto.returnSecureToken = true;
+        //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1accounts:signInWithPassword?key=AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo", dto);
+
+
+        Console.WriteLine("asd");
 
         //text = "CCC";
         //StateHasChanged();
