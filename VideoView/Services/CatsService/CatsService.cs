@@ -33,6 +33,7 @@ namespace VideoView.Services.CatsService
         public async Task AddCat(Cat cat)
         {
             var result = await _http.PostAsJsonAsync($"https://firestore.googleapis.com/v1/projects/rolka-videosmth/databases/(default)/documents/cats", new { fields = cat.fields });
+            //Cat Kate = JsonConvert.DeserializeObject<Cat>(await result.Content.ReadAsStringAsync());
         }
 
         public async Task UpdateCat(Cat cat)

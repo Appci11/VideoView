@@ -1,0 +1,57 @@
+﻿@page "/login"
+@using VideoView.Models.Dto;
+@using VideoView.Services.AuthService;
+
+@inject NavigationManager _navigationManager
+@inject IAuthService _authService
+
+<body>
+    <h3>Register</h3>
+
+    <EditForm Model="user" OnSubmit="HandleLogin">
+        <div>
+            <InputText id="email" @bind-Value="user.email" type="email" />
+            <label for="email">Email</label>
+        </div>
+        <div>
+            <InputText id="password" @bind-Value="user.password" type="password" />
+            <label for="password">Password</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </EditForm>
+    <br />
+    <p style="color: red">@ErrorMsg</p>
+    <br />
+    <div>
+        Not a member? <a href="register">Register</a>
+    </div>
+</body>
+
+@code {
+    AuthUserDto user = new AuthUserDto();
+    private InputText? inputTextForFocus;
+    private string ErrorMsg = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            if (inputTextForFocus?.Element != null)
+                await inputTextForFocus.Element.Value.FocusAsync();
+    }
+
+    async Task HandleLogin()
+    {
+        AuthResponseDto dto = await _authService.Login(user);
+        if(dto != null)
+        {
+            ErrorMsg = string.Empty;
+            _navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMsg = "Failed to login. Check email and password.";
+        }
+    }
+}

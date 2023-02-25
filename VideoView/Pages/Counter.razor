@@ -1,7 +1,12 @@
 ﻿@page "/counter"
+@*@attribute [Authorize]*@
+
+
 @using Newtonsoft.Json;
 @using VideoView.Models.Cat;
 @using VideoView.Models.Dto;
+@inject ILocalStorageService _localStorage
+@inject AuthenticationStateProvider AuthStateProvider
 
 @inject HttpClient client;
 
@@ -12,16 +17,39 @@
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="Authorize">Token In</button>
+<button class="btn btn-primary" @onclick="Unauthorize">Token Out</button>
 
 <br />
 <br />
 
 <p>@text</p>
 
+<AuthorizeView>
+    <Authorized>
+        <span>Authorized</span>
+    </Authorized>
+    <NotAuthorized>
+        <span>Nope authorized</span>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     private int currentCount = 0;
 
     private string text;
+
+    private async void Authorize()
+    {
+        string token1 = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE1YzJiNDBhYTJmMzIyNzk4NjY2YTZiMzMyYWFhMDNhNjc3MzAxOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcm9sa2EtdmlkZW9zbXRoIiwiYXVkIjoicm9sa2EtdmlkZW9zbXRoIiwiYXV0aF90aW1lIjoxNjc3MzUwNDA3LCJ1c2VyX2lkIjoiOVNJNFJ4aU1jWVljajQ5ZFVwYVFZSm9jY2VIMyIsInN1YiI6IjlTSTRSeGlNY1lZY2o0OWRVcGFRWUpvY2NlSDMiLCJpYXQiOjE2NzczNTA0MDcsImV4cCI6MTY3NzM1NDAwNywiZW1haWwiOiJwYXN0ZWxpc0BwYXN0LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJwYXN0ZWxpc0BwYXN0LmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.tzSpK5WuRfgf61HVKGtBlr8rclhCvreFkWdk7TA-v5xe0xg4VsOYekDYq08jlBz0QMjyH6EWw-9yuj9GNtqlfRMrqZ6xBHjsIvZQhde5zCuksdMgFP7uOvpKx-vG-e0490o49WeKsr1J-f_ak0PjXe2Qt9Mol7TAq4xgz6KPllqqQX795NEyurCelmh0oBAfzWUw-Uj_d3MoqLTnofXXR7mtdvOqT_PhljA6usNWUyx_NhcepPZa5m3JrmvJ0OmQuwoXDI5yBSU4t-lu7QSVysiw1KnpD3mqpY5HYcFww1Wp93PTTGMpRmAYu1DJwQqscNAwhtBR5VeXhKtE06bsEA";
+        await _localStorage.SetItemAsync("idToken", token1);
+        AuthStateProvider.GetAuthenticationStateAsync();
+    }
+    private async void Unauthorize()
+    {
+        await _localStorage.RemoveItemAsync("idToken");
+        AuthStateProvider.GetAuthenticationStateAsync();
+    }
 
     private async void IncrementCount()
     {
@@ -52,19 +80,19 @@
         //dto.email = "Userrr@user.user";
         //dto.password = "UserUser11";
         //dto.returnSecureToken = true;
-        //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1/accounts:signUp?key={key}", new
+        //var result = await client.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key}", new
+        //{
+        //    email = "Petras@gmail.com",
+        //    password = "SLAPTASzodis",
+        //    returnSecureToken = "true"
+        //});
+
+        //var result = await client.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={key}", new
         //{
         //    email = "Petras@gmail.com",
         //    password = "SLAPTASzodis",
         //    returnSecureToken = true
         //});
-
-    var result = await client.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={key}", new
-        {
-            email = "Petras@gmail.com",
-            password = "SLAPTASzodis",
-            returnSecureToken = true
-        });
 
         //AuthUserDto dto = new AuthUserDto();
         //dto.email = "Userrr@user.user";

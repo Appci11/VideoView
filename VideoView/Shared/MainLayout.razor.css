@@ -36,6 +36,10 @@ main {
         text-overflow: ellipsis;
     }
 
+nav-button + nav-button {
+    margin-left: 10px;
+}
+
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;

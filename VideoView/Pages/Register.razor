@@ -1,0 +1,62 @@
+﻿@page "/register"
+@using VideoView.Models.Dto;
+@using VideoView.Services.AuthService;
+
+@inject NavigationManager _navigationManager
+@inject IAuthService _authService
+
+<body>
+    <h3>Register</h3>
+
+    <EditForm Model="user" OnSubmit="HandleRegister">
+        <div>
+            <InputText id="email" @bind-Value="user.email" type="email" />
+            <label for="email">Email</label>
+        </div>
+        <div>
+            <InputText id="password" @bind-Value="user.password" type="password" />
+            <label for="password">Password</label>
+        </div>
+        <div>
+            <InputText id="password2" @bind-Value="Pass2" type="password" />
+            <label for="password2">Repeat Password</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+    </EditForm>
+    <br />
+    <p style="color: red">@ErrorMsg</p>
+    <br />
+</body>
+
+@code {
+    AuthUserDto user = new AuthUserDto();
+    private InputText? inputTextForFocus;
+    private string ErrorMsg = string.Empty;
+    private string Pass2 = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            if (inputTextForFocus?.Element != null)
+                await inputTextForFocus.Element.Value.FocusAsync();
+    }
+
+    async Task HandleRegister()
+    {
+        if (Pass2.CompareTo(user.password) == 0)
+        {
+            AuthResponseDto dto = await _authService.Register(user);
+            if (dto != null)
+            {
+                ErrorMsg = string.Empty;
+                _navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMsg = "Registration failed.";
+            }
+        }
+    }
+}
