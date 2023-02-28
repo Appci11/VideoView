@@ -2,12 +2,15 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Json;
+using VideoView.Models.Cat;
 using VideoView.Models.Dto;
 
 namespace VideoView.Services.AuthService
 {
     public class AuthService : IAuthService
     {
+        const string baseUrl = "https://identitytoolkit.googleapis.com/v1/";
+
         private readonly HttpClient _http;
         private readonly ILocalStorageService _localStorage;
         private readonly AuthenticationStateProvider _authProvider;
@@ -21,8 +24,9 @@ namespace VideoView.Services.AuthService
 
         public async Task<AuthResponseDto> Register(AuthUserDto authUserDto)
         {
+            
             const string key = "AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo";
-            var response = await _http.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key}", new
+            var response = await _http.PostAsJsonAsync($"{baseUrl}accounts:signUp?key={key}", new
             {
                 email = authUserDto.email,
                 password = authUserDto.password,
@@ -32,6 +36,7 @@ namespace VideoView.Services.AuthService
             {
                 AuthResponseDto dto = JsonConvert.DeserializeObject<AuthResponseDto>(await response.Content.ReadAsStringAsync());
                 await _localStorage.SetItemAsync("idToken", dto.idToken);
+                await _localStorage.SetItemAsync("userId", dto.localId);
                 await _authProvider.GetAuthenticationStateAsync();
                 return dto;
             }
@@ -40,7 +45,7 @@ namespace VideoView.Services.AuthService
         public async Task<AuthResponseDto> Login(AuthUserDto authUserDto)
         {
             const string key = "AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo";
-            var response = await _http.PostAsJsonAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={key}", new
+            var response = await _http.PostAsJsonAsync($"{baseUrl}accounts:signInWithPassword?key={key}", new
             {
                 email = authUserDto.email,
                 password = authUserDto.password,
@@ -50,6 +55,7 @@ namespace VideoView.Services.AuthService
             {
                 AuthResponseDto dto = JsonConvert.DeserializeObject<AuthResponseDto>(await response.Content.ReadAsStringAsync());
                 await _localStorage.SetItemAsync("idToken", dto.idToken);
+                await _localStorage.SetItemAsync("userId", dto.localId);
                 await _authProvider.GetAuthenticationStateAsync();
                 return dto;
             }

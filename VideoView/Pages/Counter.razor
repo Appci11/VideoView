@@ -4,9 +4,14 @@
 
 @using Newtonsoft.Json;
 @using VideoView.Models.Cat;
+@using VideoView.Models.Category;
 @using VideoView.Models.Dto;
+@using VideoView.Services.CategoriesService;
+@using VideoView.Services.UsersService;
 @inject ILocalStorageService _localStorage
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IUsersService _usersService
+@inject ICategoriesService _categoriesService
 
 @inject HttpClient client;
 
@@ -101,15 +106,21 @@
         //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo", dto);
 
 
-
         //UserRegisterDto dto = new UserRegisterDto();
         //dto.email = "User@user.user";
         //dto.password = "UserUser11";
         //dto.returnSecureToken = true;
         //var result = await client.PostAsJsonAsync($"https:identitytoolkit.googleapis.com/v1accounts:signInWithPassword?key=AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo", dto);
 
-
+        List<Category> categories = await _categoriesService.GetAllCategories("u1");
+        List<Category> categories2 = await _categoriesService.GetAllCategories("u2");
         Console.WriteLine("asd");
+
+        //if (await _usersService.AddUser("u2"))
+        //{
+        //    Console.WriteLine("Vartotojas pridetas sekmingai");
+        //}
+        //else Console.WriteLine("Vartotojas nepridetas");
 
         //text = "CCC";
         //StateHasChanged();

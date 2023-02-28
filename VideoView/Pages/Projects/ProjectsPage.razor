@@ -1,0 +1,58 @@
+﻿@page "/projects"
+@using VideoView.Models.Project;
+@using VideoView.Services.ProjectsService;
+
+
+@inject NavigationManager _navigationManager
+@inject IProjectsService _projectsService
+
+<h3>Projects</h3>
+
+@if (loaded)
+{
+    <div>
+        <QuickGrid Items="FilteredProjects" ResizableColumns Class="search">
+            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Pavadinimas">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="loading..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+        </QuickGrid>
+    </div>
+}
+else
+{
+    <dic class="loader">Loading...</dic>
+}
+@code {
+    bool loaded = false;
+    IQueryable<Project> itemsQueryable = new List<Project>().AsQueryable();
+
+    string nameFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<Project> response = await _projectsService.GetAllProjects("u1", "k1"); //HARDCODED
+        if (response != null)
+        {
+            itemsQueryable = response.AsQueryable();
+        }
+        loaded = true;
+    }
+
+    IQueryable<Project> FilteredProjects
+    {
+        get
+        {
+            var result = itemsQueryable;
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                result = result.Where(c => c.fields.name.stringValue.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            return result;
+        }
+    }
+}

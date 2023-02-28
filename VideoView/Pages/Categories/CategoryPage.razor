@@ -1,0 +1,69 @@
+﻿@page "/category"
+@page "/category/{id}"
+@using VideoView.Models.Category;
+@using VideoView.Services.CategoriesService;
+@using Blazored.LocalStorage;
+
+@inject NavigationManager _navigationManager
+@inject ICategoriesService _categoriesService
+@inject ILocalStorageService _localStorage
+
+@if(Id == null)
+{
+    <PageTitle>Kurti naują</PageTitle>
+    <h3>Naujos kategorijos kūrimas</h3>
+}
+else
+{
+    <PageTitle>Redagavimas</PageTitle>
+    <h3>Redagavimas</h3>
+}
+
+<EditForm Model="category" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Pavadinimas</label>
+        <InputText id="name" @bind-Value="category.fields.name.stringValue" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; } //case insensitive
+
+    string btnText = string.Empty;
+
+    Category category = new Category();
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Kurti naują" : "Redaguoti";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            //category = await _categoriesService.GetCategoryById(Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if(Id == null)
+        {
+            string userId = await _localStorage.GetItemAsStringAsync("userId");
+            await _categoriesService.AddCategory(category, userId);
+            _navigationManager.NavigateTo("/categories");
+        }
+        else
+        {
+            //await _categoriesService.UpdateCategory(category);
+            _navigationManager.NavigateTo("/categories");
+        }
+    }
+
+
+    // name, projectsCount
+}

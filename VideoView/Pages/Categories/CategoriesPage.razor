@@ -1,0 +1,67 @@
+﻿@page "/categories"
+@attribute [Authorize]
+@using VideoView.Models.Category;
+@using VideoView.Services.CategoriesService;
+
+@inject NavigationManager _navigationManager
+@inject ICategoriesService _categoriesService
+@inject ILocalStorageService _localStorage
+
+
+<h3>Kategorijos</h3>
+@if (loaded)
+{
+    <div>
+        <QuickGrid Items="FilteredCategories" ResizableColumns Class="search">
+            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Pavadinimas">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="loading..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+        </QuickGrid>
+    </div>
+    <button class="btn btn-primary" @onclick="CreateNewCategory">Kurti naują</button>
+}
+else
+{
+    <div class="loader">Loading...</div>
+}
+
+@code {
+    bool loaded = false;
+    IQueryable<Category> itemsQueryable = new List<Category>().AsQueryable();
+
+    string nameFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string uId = await _localStorage.GetItemAsStringAsync("userId");
+        List<Category> response = await _categoriesService.GetAllCategories(uId);
+        if (response != null)
+        {
+            itemsQueryable = response.AsQueryable();
+        }
+        loaded = true;
+    }
+
+    IQueryable<Category> FilteredCategories
+    {
+        get
+        {
+            var result = itemsQueryable;
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                result = result.Where(c => c.fields.name.stringValue.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            return result;
+        }
+    }
+
+    void CreateNewCategory()
+    {
+        _navigationManager.NavigateTo($"/category");
+    }
+}
