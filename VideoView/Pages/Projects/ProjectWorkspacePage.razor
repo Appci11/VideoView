@@ -1,4 +1,11 @@
 ﻿@page "/categories/{categoryId}/projects/{id}"
+@using Blazored.LocalStorage;
+@using VideoView.Models.Project;
+@using VideoView.Services.ProjectsService;
+
+@inject NavigationManager _navigationManager
+@inject IProjectsService _projectsService
+@inject ILocalStorageService _localStorage
 
 <h3>ProjectWorkspacePage</h3>
 
@@ -6,5 +13,21 @@
     [Parameter]
     public string categoryId { get; set; }
     [Parameter]
-    public string? Id { get; set; }
+    public string Id { get; set; }
+
+    Project project = new Project();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _projectsService.GetProjectById(categoryId, Id);
+        if(response != null)
+        {
+            project = response;
+        }
+        else
+        {
+            //throw some error
+        }
+
+    }
 }
