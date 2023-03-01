@@ -37,8 +37,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        string uId = await _localStorage.GetItemAsStringAsync("userId");
-        List<Category> response = await _categoriesService.GetAllCategories(uId);
+        List<Category> response = await _categoriesService.GetAllCategories();
         if (response != null)
         {
             itemsQueryable = response.AsQueryable();

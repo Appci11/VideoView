@@ -53,8 +53,7 @@ else
     {
         if(Id == null)
         {
-            string userId = await _localStorage.GetItemAsStringAsync("userId");
-            await _categoriesService.AddCategory(category, userId);
+            await _categoriesService.AddCategory(category);
             _navigationManager.NavigateTo("/categories");
         }
         else
