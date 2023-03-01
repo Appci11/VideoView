@@ -1,0 +1,10 @@
+﻿@page "/categories/{categoryId}/projects/{id}"
+
+<h3>ProjectWorkspacePage</h3>
+
+@code {
+    [Parameter]
+    public string categoryId { get; set; }
+    [Parameter]
+    public string? Id { get; set; }
+}

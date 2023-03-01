@@ -45,7 +45,7 @@ else
     {
         if (Id != null)
         {
-            //category = await _categoriesService.GetCategoryById(Id);
+            category = await _categoriesService.GetCategoryById(Id);
         }
     }
 
@@ -58,7 +58,7 @@ else
         }
         else
         {
-            //await _categoriesService.UpdateCategory(category);
+            await _categoriesService.UpdateCategory(category, Id);
             _navigationManager.NavigateTo("/categories");
         }
     }

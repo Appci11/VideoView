@@ -1,0 +1,67 @@
+﻿@page "/categories/{categoryId}/project/"
+@page "/categories/{categoryId}/project/{id}"
+@using Blazored.LocalStorage;
+@using VideoView.Models.Project;
+@using VideoView.Services.ProjectsService;
+
+@inject NavigationManager _navigationManager
+@inject IProjectsService _projectsService
+@inject ILocalStorageService _localStorage
+
+@if (Id == null)
+{
+        <PageTitle>Kurti naują</PageTitle>
+        <h3>Naujo projekto kūrimas</h3>
+}
+else
+{
+        <PageTitle>Redagavimas</PageTitle>
+        <h3>Redagavimas</h3>
+}
+
+<EditForm Model="project" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Pavadinimas</label>
+        <InputText id="name" @bind-Value="project.fields.name.stringValue" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string categoryId { get; set; }
+    [Parameter]
+    public string? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    Project project = new Project();
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Kurti naują" : "Redaguoti";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            project = await _projectsService.GetProjectById(categoryId, Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await _projectsService.AddProject(project, categoryId);
+            _navigationManager.NavigateTo($"categories/{categoryId}/projects");
+        }
+        else
+        {
+            await _projectsService.UpdateProject(project, categoryId, Id);
+            _navigationManager.NavigateTo($"categories/{categoryId}/projects");
+        }
+    }
+}

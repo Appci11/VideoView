@@ -4,6 +4,10 @@ namespace VideoView.Services.ProjectsService
 {
     public interface IProjectsService
     {
-        public Task<List<Project>> GetAllProjects(string uId, string cId);
+        public Task<List<Project>> GetAllProjects(string categoryId);
+        public Task<Project> GetProjectById(string categoryId, string id);
+        public Task<bool> AddProject(Project project, string categoryId);
+        public Task<bool> UpdateProject(Project project, string categoryId, string id);
+        public Task<bool> DeleteCategory(string categoryId, string id);
     }
 }

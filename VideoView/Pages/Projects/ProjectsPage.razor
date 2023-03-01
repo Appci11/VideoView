@@ -1,4 +1,4 @@
-﻿@page "/projects"
+﻿@page "/categories/{categoryId}/projects"
 @using VideoView.Models.Project;
 @using VideoView.Services.ProjectsService;
 
@@ -12,21 +12,30 @@
 {
     <div>
         <QuickGrid Items="FilteredProjects" ResizableColumns Class="search">
-            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Pavadinimas">
+            <PropertyColumn Property="p => p.fields.name.stringValue" Sortable="true" Title="Pavadinimas">
                 <ColumnOptions>
                     <div class="search-box">
-                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="loading..." />
+                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="pavadinimas" />
                     </div>
                 </ColumnOptions>
             </PropertyColumn>
+            <PropertyColumn Property="p => p.createTime" Sortable="true" Title="Sukurta" />
+            <TemplateColumn Title="Veiksmai">
+                <button @onclick="@(() => GoToProject(context))" class="btn btn-primary oi oi-arrow-thick-right"></button>
+                <button @onclick="@(() => Edit_Click(context))" class="btn btn-primary oi oi-pencil"></button>
+                <button @onclick="@(() => Delete_Click(context))" class="btn btn-danger oi oi-x"></button>
+            </TemplateColumn>
         </QuickGrid>
     </div>
+    <button class="btn btn-primary" @onclick="CreateNewProject">Kurti naują</button>
 }
 else
 {
     <dic class="loader">Loading...</dic>
 }
 @code {
+    [Parameter]
+    public string categoryId { get; set; }
     bool loaded = false;
     IQueryable<Project> itemsQueryable = new List<Project>().AsQueryable();
 
@@ -34,7 +43,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        List<Project> response = await _projectsService.GetAllProjects("u1", "k1"); //HARDCODED
+        List<Project> response = await _projectsService.GetAllProjects(categoryId); //HARDCODED
         if (response != null)
         {
             itemsQueryable = response.AsQueryable();
@@ -54,5 +63,38 @@ else
             }
             return result;
         }
+    }
+
+    void GoToProject(Project p)
+    {
+        string projectId = p.name.Split('/').Last();
+        _navigationManager.NavigateTo($"categories/{categoryId}/projects/{projectId}");
+    }
+
+    void CreateNewProject()
+    {
+        _navigationManager.NavigateTo($"categories/{categoryId}/project");
+    }
+
+    void Edit_Click(Project p)
+    {
+        string id = p.name.Split('/').Last();
+        _navigationManager.NavigateTo($"categories/{categoryId}/project/{id}");
+    }
+
+    async void Delete_Click(Project p)
+    {
+        string id = p.name.Split('/').Last();
+        await _projectsService.DeleteCategory(categoryId, id);
+        List<Project> response = await _projectsService.GetAllProjects(categoryId);
+        if(response != null)
+        {
+            itemsQueryable = response.AsQueryable();
+        }
+        else
+        {
+            itemsQueryable = new List<Project>().AsQueryable();
+        }
+        StateHasChanged();
     }
 }

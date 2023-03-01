@@ -13,13 +13,19 @@
 {
     <div>
         <QuickGrid Items="FilteredCategories" ResizableColumns Class="search">
-            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Pavadinimas">
+            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Pavadinimas" >
                 <ColumnOptions>
                     <div class="search-box">
-                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="loading..." />
+                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="pavadinimas" />
                     </div>
                 </ColumnOptions>
             </PropertyColumn>
+            <PropertyColumn Property="c => c.createTime" Sortable="true" Title="Sukurta" />
+            <TemplateColumn Title="Veiksmai">
+                <button @onclick="@(() => GoToProjects(context))" class="btn btn-primary oi oi-arrow-thick-right"></button>
+                <button @onclick="@(() => Edit_Click(context))" class="btn btn-primary oi oi-pencil"></button>
+                <button @onclick="@(() => Delete_Click(context))" class="btn btn-danger oi oi-x"></button>
+            </TemplateColumn>
         </QuickGrid>
     </div>
     <button class="btn btn-primary" @onclick="CreateNewCategory">Kurti naują</button>
@@ -59,8 +65,36 @@ else
         }
     }
 
+    void GoToProjects(Category c)
+    {
+        string categoryId = c.name.Split('/').Last();
+        _navigationManager.NavigateTo($"categories/{categoryId}/projects");
+    }
+
     void CreateNewCategory()
     {
-        _navigationManager.NavigateTo($"/category");
+        _navigationManager.NavigateTo($"category");
+    }
+
+    void Edit_Click(Category c)
+    {
+        string id = c.name.Split('/').Last();
+        _navigationManager.NavigateTo($"category/{id}");
+    }
+
+    async void Delete_Click(Category c)
+    {
+        string id = c.name.Split('/').Last();
+        await _categoriesService.DeleteCategory(id);
+        List<Category> response = await _categoriesService.GetAllCategories();
+        if (response != null)
+        {
+            itemsQueryable = response.AsQueryable();
+        }
+        else    //or reload page, this way is faster
+        {
+            itemsQueryable = new List<Category>().AsQueryable();
+        }
+        StateHasChanged();
     }
 }
