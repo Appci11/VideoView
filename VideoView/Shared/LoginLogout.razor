@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
-@inject ILocalStorageService LocalStorage
+@inject ILocalStorageService _localStorage
 @inject AuthenticationStateProvider AuthStateProvider
 
 <AuthorizeView>
@@ -21,8 +21,11 @@
 
     async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync("idToken");
-        await LocalStorage.RemoveItemAsync("userId");
+        await _localStorage.RemoveItemAsync("idToken");
+        await _localStorage.RemoveItemAsync("idTokenExpirationDate");
+        await _localStorage.RemoveItemAsync("refreshToken");
+        await _localStorage.RemoveItemAsync("userId");
+        await _localStorage.RemoveItemAsync("keepLoggedIn");
         await AuthStateProvider.GetAuthenticationStateAsync();
         NavigationManager.NavigateTo("/");
     }

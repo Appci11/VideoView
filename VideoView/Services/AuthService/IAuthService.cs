@@ -6,6 +6,7 @@ namespace VideoView.Services.AuthService
     public interface IAuthService
     {
         Task<AuthResponseDto> Register(AuthUserDto authUserDto);
-        Task<AuthResponseDto> Login(AuthUserDto authUserDto);
+        Task<AuthResponseDto> Login(AuthUserDto authUserDto, bool stayLoggedIn);
+        Task<bool> RefreshTokens();
     }
 }

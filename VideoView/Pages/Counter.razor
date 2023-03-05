@@ -6,13 +6,14 @@
 @using VideoView.Models.Cat;
 @using VideoView.Models.Category;
 @using VideoView.Models.Dto;
+@using VideoView.Services.AuthService;
 @using VideoView.Services.CategoriesService;
 @using VideoView.Services.UsersService;
 @inject ILocalStorageService _localStorage
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IUsersService _usersService
 @inject ICategoriesService _categoriesService
-
+@inject IAuthService _authService
 @inject HttpClient client;
 
 <PageTitle>Counter</PageTitle>
@@ -38,11 +39,115 @@
         <span>Nope authorized</span>
     </NotAuthorized>
 </AuthorizeView>
+@*
+<br />
+<br />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/oJYGSy6fRic" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br />
+<br />
+*@
+@*<Video Source="@("https://www.youtube.com/embed/tgbNymZ7vqY")" />*@
+@*
+<br />
+<br />
+video from file
+<video controls="controls" width="600px" height="500px">
+    <source src="video_example.mp4" />
+</video>
+<br />
+<br />
+video from youtube
+<video controls="controls" width="600px" height="500px">
+    <source src="https://www.youtube.com/embed/tgbNymZ7vqY" />
+</video>
+<br />
+<br />
+blazored
+<BlazoredVideo class="w-100"
+               style="max-width:800px;"
+               controls="controls">
+    <source src="https://youtu.be/tgbNymZ7vqY" type="video/mp4" />
+</BlazoredVideo>
+<br />
+<br />
+<embed src="https://www.youtube.com/embed/tgbNymZ7vqY" />
+<br />
+<br />
+<body>
+    <object data='https://www.youtube.com/embed/tgbNymZ7vqY'
+            width='500px' height='300px'>
+    </object>
+    <br>
+    <embed src="https://www.youtube.com/embed/tgbNymZ7vqY" type="">
+</body>
+*@
+
+
+<button class="btn btn-primary" @onclick="CheckTime">Check time</button>
+<br />
+<button class="btn btn-primary" @onclick="LoggedIn">LoggedIn</button>
 
 @code {
     private int currentCount = 0;
 
+
+
     private string text;
+
+    void OnPlay()
+    {
+        Console.WriteLine("asd");
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _localStorage.SetItemAsync<DateTime>("dabar", DateTime.Now.AddSeconds(30));
+    }
+
+    async void LoggedIn()
+    {
+        await _localStorage.SetItemAsync<bool>("keepLoggedIn", true);
+    }
+
+    async void CheckTime()
+    {
+        //client.DefaultRequestHeaders.Clear();
+        //await _authService.RefreshTokens();
+        //var dto = await client.PostAsJsonAsync("https://securetoken.googleapis.com/v1/token?key=AIzaSyAtMYXiTMigdvDTG6B4V6MP768GL591NVo", new
+        //{
+        //    grant_type = "refresh_token",
+        //    refresh_token = "APJWN8c_MSYTh6nWgGdFpXbDEFCEybIskT6K2yUgd9bGA7LSX1SQ5ItGR1t6nvg_NvcYIbk32M2fK54OUWeIwIEH_umgfEVhNLBgl9S4qbR-qyPP_MHB_uhg8J7Mc0t_9lrejDK1gKS2xecuG8t_p3QMTQPwXhGqyKjvGHGlbuACmpjqaw4X142GG6LCmnv0LbrDfVAMiazzVLW3Ut3L6IriuVcDFjWIbQ"
+        //});
+
+        if (await _authService.RefreshTokens())
+        {
+            Console.WriteLine("refreshed");
+        }
+        else
+        {
+            Console.WriteLine("not refreshed");
+        }
+
+        //DateTime check = await _localStorage.GetItemAsync<DateTime>("dabar");
+        //if (await _localStorage.ContainKeyAsync("daba"))
+        //{
+        //    Console.WriteLine("Rasta");
+        //}
+        //else
+        //{
+        //    Console.WriteLine("Nerasta");
+        //}
+        //if(check < DateTime.Now)
+        //{
+        //    Console.WriteLine("it's too late...");
+        //}
+        //else
+        //{
+        //    Console.WriteLine("Not too late");
+        //}
+
+    }
 
     private async void Authorize()
     {

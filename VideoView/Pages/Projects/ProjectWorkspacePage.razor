@@ -9,6 +9,19 @@
 
 <h3>ProjectWorkspacePage</h3>
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/oJYGSy6fRic" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen @onpause="@(() => Paused())"></iframe>
+
+<br />
+<br />
+<br />
+
+
+
+
+<div>
+    @text
+</div>
+
 @code {
     [Parameter]
     public string categoryId { get; set; }
@@ -17,10 +30,12 @@
 
     Project project = new Project();
 
+    string text = "AaAaA";
+
     protected override async Task OnInitializedAsync()
     {
         var response = await _projectsService.GetProjectById(categoryId, Id);
-        if(response != null)
+        if (response != null)
         {
             project = response;
         }
@@ -28,6 +43,16 @@
         {
             //throw some error
         }
+    }
 
+    void Paused()
+    {
+        Console.WriteLine("Got here");
+        text = "Paused";
+    }
+
+    void Started()
+    {
+        text = "Started";
     }
 }

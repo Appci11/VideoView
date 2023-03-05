@@ -1,6 +1,7 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 
+@*
 <PageTitle>Weather forecast</PageTitle>
 
 <h1>Weather forecast</h1>
@@ -35,9 +36,29 @@ else
         </tbody>
     </table>
 }
-
+*@
+<input id="stayLoggedInCheck" type="checkbox" @bind="IsChecked">
+<label for="stayLoggedInCheck">Stay logged in</label>
+<br />
+<button class="btn btn-primary" @onclick="Check">Check</button>
+<br />
+<p>@text</p>
 @code {
     private WeatherForecast[]? forecasts;
+
+    public bool IsChecked { get; set; }
+    string text = "kriu";
+    void Check()
+    {
+        if (IsChecked)
+        {
+            text = "True";    
+        }
+        else
+        {
+            text = "False";
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
