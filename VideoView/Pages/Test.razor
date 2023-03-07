@@ -1,0 +1,43 @@
+﻿@page "/test"
+@using Newtonsoft.Json;
+@using System.Text;
+@using VideoView.Models.Cat;
+@using VideoView.Models.Project;
+@using System.Net.Http.Json;
+@using VideoView.Services.ProjectsService;
+
+@inject IProjectsService _projectsService
+
+<button class="btn btn-primary" @onclick="DoStuff">Click me</button>
+
+
+
+@code {
+
+    async void DoStuff()
+    {
+        byte[] arr = { 1, 0, 0, 0 };
+        Cat cat = new Cat();
+        cat.fields.name.stringValue = "Kaaaaaaaaatinc";
+        byte[] arr2 = ObjToByte<Cat>(cat);
+
+        Project projektas = new Project();
+        projektas.fields.name.stringValue = "Projektas1";
+        projektas.fields.blobFile.bytesValue = arr2;
+        await _projectsService.UpdateProject(projektas, "0GvQ2oGbm1Lt7UVddNpv", "QBQsCDuz75k6O6NXpjuA");
+        Project projektas2 = await _projectsService.GetProjectById("0GvQ2oGbm1Lt7UVddNpv", "QBQsCDuz75k6O6NXpjuA");
+        Cat respawnedCat = ByteToObj<Cat>(projektas2.fields.blobFile.bytesValue);
+        Console.WriteLine("kriu");
+    }
+
+    TData ByteToObj<TData>(byte[] arr)
+    {
+        return JsonConvert.DeserializeObject<TData>(Encoding.UTF8.GetString(arr));
+    }
+
+    byte[] ObjToByte<TData>(TData data)
+    {
+        var json = JsonConvert.SerializeObject(data);
+        return Encoding.UTF8.GetBytes(json);
+    }
+}

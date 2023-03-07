@@ -23,13 +23,6 @@
 @code {
     protected override async void OnInitialized()
     {
-        if (await _authService.RefreshTokens())
-        {
-            Console.WriteLine("refreshed");
-        }
-        else
-        {
-            Console.WriteLine("not refreshed");
-        }
+        await _authService.RefreshTokens();
     }
 }

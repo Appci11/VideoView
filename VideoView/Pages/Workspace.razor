@@ -1,0 +1,34 @@
+﻿@page "/workspace"
+@using VideoView.Services.WorkspaceService;
+
+@inject IWorkspaceService _workspaceService
+
+
+@if (loaded)
+{
+    <h3>Workspace, @_workspaceService.CategoryName, @_workspaceService.projectName </h3>
+
+    <label for="name">Name</label>
+    <InputText id="name" @bind-Value="_workspaceService.WorkClass.name"></InputText>
+}
+else
+{
+    <i>gathering things from server...</i>
+}
+
+<button class="btn btn-primary" @onclick="SaveChanges">Išsaugoti pakeitimus</button>
+
+@code {
+    bool loaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _workspaceService.GetProjectData();
+        loaded = true;
+    }
+
+    void SaveChanges()
+    {
+        _workspaceService.SendProjectDataToServer();
+    }
+}

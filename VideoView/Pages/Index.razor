@@ -1,5 +1,66 @@
 ﻿@page "/"
+@using VideoView.Models.Category;
+@using VideoView.Models.Project;
+@using VideoView.Services.CategoriesService;
+@using VideoView.Services.ProjectsService;
+@using VideoView.Services.WorkspaceService;
 
+@inject AuthenticationStateProvider _authStateProvider
+@inject NavigationManager _navigationManager
+@inject ICategoriesService _categoriesService
+@inject IProjectsService _projectsService
+@inject IWorkspaceService _workspaceService
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-outline-secondary" @onclick="GoToLogin">Prisijungti</button>
+        </div>
+        @*
+        <-------VELIAU
+        <br />
+        <button type="button" class="btn btn-outline-secondary" @onclick="OpenFileUpload">Dirbti neprisijungus</button>
+        <br />
+        @if(anonymousWork)
+        {
+
+        }
+        *@
+    </NotAuthorized>
+    <Authorized>
+        @if (categoriesExist)
+        {
+            <label for="category">Rastos kategorijos</label>
+            <select id="category" class="form-select"@onchange="GetProjects">
+                <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
+                @foreach (Category category in Categories!)
+                {
+                    <option value="@category.name">@category.fields.name.stringValue</option>
+                }
+            </select>
+            <br />
+            <label for="project">Rasti projektai</label>
+            <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
+                <option value="" selected disabled hidden>Pasirinkti projektą</option>
+                @if (Projects != null)
+                {
+                    @foreach (Project project in Projects!)
+                    {
+                        <option value="@project.name">@project.fields.name.stringValue</option>
+                    }
+                }
+            </select>
+        }
+        <br />
+        <div>
+            @errorText
+        </div>
+        <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
+
+    </Authorized>
+</AuthorizeView>
+
+@*
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
@@ -7,3 +68,69 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+*@
+@code {
+    List<Category>? Categories;
+    string CategoryId { get; set; } = string.Empty;
+    List<Project>? Projects;
+    string ProjectId { get; set; } = string.Empty;
+
+    bool categoriesExist = false;
+    bool projectsSelectionDisabled = true;
+    bool goToWorkspaceDisabled = true;
+
+    string errorText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            Categories = await _categoriesService.GetAllCategories();
+        }
+        if (Categories != null && Categories.Count > 0)
+        {
+            categoriesExist = true;
+        }
+        else
+        {
+            errorText = "Nerasta nei viena kategorija.";
+        }
+    }
+
+    async void GetProjects(ChangeEventArgs e)
+    {
+        CategoryId = e.Value.ToString().Split('/').Last();
+        Projects = await _projectsService.GetAllProjects(CategoryId);
+        if (Projects != null && Projects.Count > 0)
+        {
+            projectsSelectionDisabled = false;
+            StateHasChanged();
+        }
+        else
+        {
+            errorText = "Pasirinkta kategorija neturi nei vieno projekto.";
+            StateHasChanged();
+        }
+    }
+
+    void SelectProject(ChangeEventArgs e)
+    {
+        ProjectId = e.Value.ToString().Split('/').Last();
+        goToWorkspaceDisabled = false;
+        StateHasChanged();
+    }
+
+    void GoToLogin()
+    {
+        _navigationManager.NavigateTo("login");
+    }
+
+    void GoToWorkspace()
+    {
+        _workspaceService.CategoryId = CategoryId;
+        _workspaceService.ProjectId = ProjectId;
+        _navigationManager.NavigateTo("workspace");
+    }
+}

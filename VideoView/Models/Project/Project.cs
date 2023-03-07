@@ -10,10 +10,15 @@
     public class Fields
     {
         public Name name { get; set; } = new Name();
+        public BlobFile blobFile { get; set; } = new BlobFile();
     }
 
     public class Name
     {
         public string stringValue { get; set; } = string.Empty;
+    }
+    public class BlobFile
+    {
+        public byte[] bytesValue { get; set; } = new byte[0];
     }
 }

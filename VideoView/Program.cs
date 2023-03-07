@@ -8,6 +8,7 @@ using VideoView.Services.CategoriesService;
 using VideoView.Services.CatsService;
 using VideoView.Services.ProjectsService;
 using VideoView.Services.UsersService;
+using VideoView.Services.WorkspaceService;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -23,5 +24,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<IProjectsService, ProjectsService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 
 await builder.Build().RunAsync();

@@ -39,15 +39,15 @@
         <span>Nope authorized</span>
     </NotAuthorized>
 </AuthorizeView>
-@*
+
 <br />
 <br />
 <iframe width="560" height="315" src="https://www.youtube.com/embed/oJYGSy6fRic" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <br />
 <br />
-*@
-@*<Video Source="@("https://www.youtube.com/embed/tgbNymZ7vqY")" />*@
-@*
+
+<Video Source="@("https://www.youtube.com/embed/tgbNymZ7vqY")" />
+
 <br />
 <br />
 video from file
@@ -80,7 +80,7 @@ blazored
     <br>
     <embed src="https://www.youtube.com/embed/tgbNymZ7vqY" type="">
 </body>
-*@
+
 
 
 <button class="btn btn-primary" @onclick="CheckTime">Check time</button>
@@ -120,14 +120,14 @@ blazored
         //    refresh_token = "APJWN8c_MSYTh6nWgGdFpXbDEFCEybIskT6K2yUgd9bGA7LSX1SQ5ItGR1t6nvg_NvcYIbk32M2fK54OUWeIwIEH_umgfEVhNLBgl9S4qbR-qyPP_MHB_uhg8J7Mc0t_9lrejDK1gKS2xecuG8t_p3QMTQPwXhGqyKjvGHGlbuACmpjqaw4X142GG6LCmnv0LbrDfVAMiazzVLW3Ut3L6IriuVcDFjWIbQ"
         //});
 
-        if (await _authService.RefreshTokens())
-        {
-            Console.WriteLine("refreshed");
-        }
-        else
-        {
-            Console.WriteLine("not refreshed");
-        }
+        //if (await _authService.RefreshTokens())
+        //{
+        //    Console.WriteLine("refreshed");
+        //}
+        //else
+        //{
+        //    Console.WriteLine("not refreshed");
+        //}
 
         //DateTime check = await _localStorage.GetItemAsync<DateTime>("dabar");
         //if (await _localStorage.ContainKeyAsync("daba"))
