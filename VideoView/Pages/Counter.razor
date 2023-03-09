@@ -1,6 +1,7 @@
 ﻿@page "/counter"
 @*@attribute [Authorize]*@
 
+@inject IJSRuntime JSRuntime
 
 @using Newtonsoft.Json;
 @using VideoView.Models.Cat;
@@ -25,6 +26,9 @@
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <button class="btn btn-primary" @onclick="Authorize">Token In</button>
 <button class="btn btn-primary" @onclick="Unauthorize">Token Out</button>
+<br />
+<br />
+<button class="btn btn-primary" @onclick="DownloadFile">Download File</button>
 
 <br />
 <br />
@@ -90,9 +94,12 @@ blazored
 @code {
     private int currentCount = 0;
 
-
-
     private string text;
+
+    public async void DownloadFile()
+    {
+        await JSRuntime.InvokeAsync<object>("saveFile", "FailoVardas.xml", "FailoTurinys");
+    }
 
     void OnPlay()
     {

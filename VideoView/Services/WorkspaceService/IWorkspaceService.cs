@@ -1,5 +1,6 @@
 ﻿using VideoView.Models;
 using VideoView.Models.Project;
+using VideoView.Models.StoryScriptParts;
 
 namespace VideoView.Services.WorkspaceService
 {
@@ -14,6 +15,10 @@ namespace VideoView.Services.WorkspaceService
 
         public Task GetProjectData();
         public Task<bool> SendProjectDataToServer();
+
+        public void AddStoryScriptPart(StoryPart storyPart);
+        public void UpdateStoryScriptPart(StoryPart storyPart, int index);
+        public void RemoveStoryScriptPart(int index);
 
     }
 

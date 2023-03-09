@@ -1,0 +1,101 @@
+﻿@page "/workspace"
+@using System.Xml.Linq;
+@using System.Text;
+@using VideoView.Models;
+@using VideoView.Models.StoryScriptParts;
+@using VideoView.Pages.Workspace.StoryTabsContent
+
+@inject IJSRuntime JSRuntime
+@inject IWorkspaceService _workspaceService
+
+@if (loaded)
+{
+    <h3>Workspace, @_workspaceService.CategoryName, @_workspaceService.projectName </h3>
+
+    <label for="name">Name</label>
+    <InputText id="name" @bind-Value="_workspaceService.WorkClass.name"></InputText>
+}
+else
+{
+    <i>gathering things from server...</i>
+}
+
+<button class="btn btn-primary" @onclick="SaveChanges">Išsaugoti pakeitimus serveryje</button>
+<a>_________</a>
+<button class="btn btn-primary" @onclick="DownloadFile">Parsisiųsti (dabartinę versiją)</button>
+
+@if (loaded)
+{
+    <StoryTabsComponent></StoryTabsComponent>
+}
+
+@code {
+    bool loaded = false;
+
+    WorkClass? work;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _workspaceService.GetProjectData();
+        work = _workspaceService.WorkClass;
+        loaded = true;
+    }
+
+    void SaveChanges()
+    {
+        _workspaceService.SendProjectDataToServer();
+    }
+
+    public async void DownloadFile()
+    {
+        XDocument xmlDocument = CreateXmlFile();
+        foreach (StoryPart item in _workspaceService.WorkClass.StoryScript.StoryParts)
+        {
+            XElement element = CreateStoryPartElement(item);
+            AddStoryPart(xmlDocument, element);
+        }
+
+        //Console.WriteLine(xmlDocument.ToString());
+        await JSRuntime.InvokeAsync<object>("saveFile", "FailoVardas.xml", xmlDocument.ToString());
+    }
+    static XDocument CreateXmlFile()
+    {
+        // kaip  "storyscript.xml" faile, be antrasciu ir t.t.
+        XDocument document = new XDocument
+            (
+                new XElement("krpano")
+            );
+
+        return document;
+    }
+    static XElement CreateStoryPartElement(StoryPart sPart)
+    {
+        XElement elem;
+        if (sPart.Speech == null)
+        {
+            elem = new XElement(sPart.Title,
+                        new XAttribute("name", sPart.Name));
+        }
+        else
+        {
+            elem = new XElement(sPart.Title,
+                        new XAttribute("name", sPart.Name),
+                        new XAttribute("speech", sPart.Speech));
+        }
+        List<XElement> elements = new List<XElement>();
+        int i = 1;
+        foreach (Talk t in sPart.Talks)
+        {
+            elements.Add(new XElement("talk",
+                            new XAttribute("name", $"t{i++}"),
+                            new XAttribute("text", t.Text),
+                            new XAttribute("wait", t.Wait)));
+        }
+        elem.Add(elements);
+        return elem;
+    }
+    static void AddStoryPart(XDocument doc, XElement elem)
+    {
+        doc.Root.Add(elem);
+    }
+}

@@ -1,0 +1,81 @@
+﻿@inject IWorkspaceService _workspaceService
+@inject NavigationManager _navigationManager
+
+<h1>Storyscript parts</h1>
+<div class="tab">
+    <button style="@(tab1?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(1))">Story Parts (@_workspaceService.WorkClass.StoryScript.StoryParts.Count)</button>
+    <button style="@(tab2?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(2))">Question Parts</button>
+    <button style="@(tab3?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(3))">Story Menu</button>
+    <button style="@(tab4?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(4))">Story Observer</button>
+
+</div>
+@if (tab1)
+{
+    <div class="tabcontent">
+        <StoryPartComponent Notify="NotifyAboutChanges"></StoryPartComponent>
+    </div>
+}
+@if (tab2)
+{
+    <div class="tabcontent">
+        <h3>Tab2</h3>
+    </div>
+}
+@if (tab3)
+{
+    <div class="tabcontent">
+        <h3>Tab3</h3>
+    </div>
+}
+@if (tab4)
+{
+    <div class="tabcontent">
+        <h3>Tab4</h3>
+    </div>
+}
+
+
+
+@code {
+    private bool tab1 = true;
+    private bool tab2 = false;
+    private bool tab3 = false;
+    private bool tab4 = false;
+
+    public void DisplayTab(int TabNumber)
+    {
+        switch (TabNumber)
+        {
+            case 1:
+                this.tab1 = true;
+                this.tab2 = false;
+                this.tab3 = false;
+                this.tab4 = false;
+                break;
+            case 2:
+                this.tab1 = false;
+                this.tab2 = true;
+                this.tab3 = false;
+                this.tab4 = false;
+                break;
+            case 3:
+                this.tab1 = false;
+                this.tab2 = false;
+                this.tab3 = true;
+                this.tab4 = false;
+                break;
+            case 4:
+                this.tab1 = false;
+                this.tab2 = false;
+                this.tab3 = false;
+                this.tab4 = true;
+                break;
+        }
+    }
+
+    void NotifyAboutChanges()
+    {
+        Console.WriteLine("CHILD SAID HI");
+        StateHasChanged();
+    }
+}

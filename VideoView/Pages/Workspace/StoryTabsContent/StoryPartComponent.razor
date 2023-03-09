@@ -1,0 +1,117 @@
+﻿@using VideoView.Models.StoryScriptParts;
+@inject IWorkspaceService _workspaceService
+
+<div class="grid-container">
+    <!-- LEFT SIDE -->
+    <div>
+        <EditForm Model="storypart">
+            <h2>Story Part</h2><h2>Index = @storypartIndex</h2>
+            <div>
+                <label for="title">Title</label>
+                <InputText id="title" @bind-Value="storypart.Title" class="form-control" style="max-width:300px"></InputText>
+            </div>
+            <div>
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="storypart.Name" class="form-control" style="max-width:300px" placeholder="aka Language"></InputText>
+            </div>
+            <div>
+                <label for="speech">Speech (uri to .mp3 audio file)</label>
+                <InputText id="speech" @bind-Value="storypart.Speech" class="form-control" style="max-width:300px"></InputText>
+            </div>
+            <hr />
+            <h2>Story Parts' Talking Points</h2>
+            @foreach (var item in storypart.Talks)
+            {
+                <div>
+                    <label for="txt">Text</label>
+                    <InputText id="txt" @bind-Value="item.Text" class="form-control" style="max-width:300px"></InputText>
+                </div>
+                <div>
+                    <label for="wait">Speech (time)</label>
+                    <InputNumber id="wait" @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
+                </div>
+            }
+            <br />
+            <button @onclick="AddTalkingPoint" class="btn btn-primary">More Talking Points</button>
+            <br />
+            <button @onclick="RemoveTalkingPoint" class="btn btn-primary">Less Talking Points</button>
+
+            <br />
+            <br />
+            <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Story Part With Current Data</button>
+        </EditForm>
+        <br />
+        <button disabled="@editDeleteDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Part</button>
+        <br />
+        <button disabled="@editDeleteDisable" @onclick="RemoveCurrentlySelected" class="btn btn-danger">Remove Selected Story Part</button>
+        <br />
+    </div>
+    <!-- RIGHT SIDE -->
+    <div>
+        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
+        {
+            <a style="cursor:pointer;" @onclick="(() => LoadSelected(item))">@item.Title</a>
+            <br />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback Notify { get; set; }
+
+    List<Talk> Talks = new List<Talk> { new Talk() };
+    StoryPart storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
+
+    int storypartIndex = -1;
+    bool editDeleteDisable = true;
+
+
+    void AddTalkingPoint()
+    {
+        storypart.Talks.Add(new Talk());
+    }
+
+    void RemoveTalkingPoint()
+    {
+        storypart.Talks.RemoveAt(storypart.Talks.Count - 1);
+    }
+
+    void LoadSelected(StoryPart item)
+    {
+        StoryPart temp = new StoryPart();
+        temp.Title = item.Title;
+        temp.Name = item.Name;
+        temp.Speech = item.Speech;
+        foreach (Talk talk in item.Talks)
+        {
+            temp.Talks.Add(talk);
+        }
+        storypart = temp;
+        storypartIndex = _workspaceService.WorkClass.StoryScript.StoryParts.FindIndex((x) => x.Equals(item));
+        editDeleteDisable = false;
+    }
+
+    async void HandleSubmit()
+    {
+        _workspaceService.AddStoryScriptPart(storypart);
+        storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
+        editDeleteDisable = true;
+        storypartIndex = -1;
+        await Notify.InvokeAsync();
+    }
+
+    void EditCurrentlySelected()
+    {
+        _workspaceService.UpdateStoryScriptPart(storypart, storypartIndex);
+    }
+
+    async void RemoveCurrentlySelected()
+    {
+        _workspaceService.RemoveStoryScriptPart(storypartIndex);
+        storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
+        editDeleteDisable = true;
+        storypartIndex = -1;
+        await Notify.InvokeAsync();
+    }
+}

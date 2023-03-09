@@ -3,6 +3,7 @@ using System.Text;
 using VideoView.Models;
 using VideoView.Models.Category;
 using VideoView.Models.Project;
+using VideoView.Models.StoryScriptParts;
 using VideoView.Services.CategoriesService;
 using VideoView.Services.ProjectsService;
 
@@ -54,6 +55,38 @@ namespace VideoView.Services.WorkspaceService
         {
             var json = JsonConvert.SerializeObject(data);
             return Encoding.UTF8.GetBytes(json);
+        }
+
+        public void AddStoryScriptPart(StoryPart storyPart)
+        {
+            // Need a new copy...
+            StoryPart temp = new StoryPart();
+            temp.Title = storyPart.Title;
+            temp.Name= storyPart.Name;
+            temp.Speech = storyPart.Speech;
+            foreach(Talk item in storyPart.Talks)
+            {
+                temp.Talks.Add(item);
+            }
+            WorkClass.StoryScript.StoryParts.Add(temp);
+        }
+
+        public void UpdateStoryScriptPart(StoryPart storyPart, int index)
+        {
+            Console.WriteLine();
+            // Need a new copy...
+            this.WorkClass.StoryScript.StoryParts[index].Title = storyPart.Title;
+            this.WorkClass.StoryScript.StoryParts[index].Name = storyPart.Name;
+            this.WorkClass.StoryScript.StoryParts[index].Speech = storyPart.Speech;
+            this.WorkClass.StoryScript.StoryParts[index].Talks.Clear();
+            foreach (Talk item in storyPart.Talks)
+            {
+                this.WorkClass.StoryScript.StoryParts[index].Talks.Add(item);
+            }
+        }
+        public void RemoveStoryScriptPart(int index)
+        {
+            this.WorkClass.StoryScript.StoryParts.RemoveAt(index);
         }
     }
 }
