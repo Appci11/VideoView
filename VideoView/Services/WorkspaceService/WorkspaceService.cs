@@ -27,11 +27,11 @@ namespace VideoView.Services.WorkspaceService
             _projectsService = projectsService;
         }
 
-        public async Task GetProjectData()
+        public async Task GetProjectData(string categoryId, string projectId)
         {
             Category category = await _categoriesService.GetCategoryById(CategoryId);
             CategoryName = category.fields.name.stringValue;
-            Project = await _projectsService.GetProjectById(CategoryId, ProjectId);
+            Project = await _projectsService.GetProjectById(categoryId, projectId);
             projectName = Project.fields.name.stringValue;
             if(Project.fields.blobFile.bytesValue.Length > 0)
             {

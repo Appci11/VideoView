@@ -2,3 +2,7 @@
     display: grid;
     grid-template-columns: auto auto;
 }
+
+a + a {
+    margin-left: 10px;
+}

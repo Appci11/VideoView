@@ -13,7 +13,7 @@ namespace VideoView.Services.WorkspaceService
         public Project Project { get; set; }
         public WorkClass WorkClass { get; set; }
 
-        public Task GetProjectData();
+        public Task GetProjectData(string categoryId, string projectId);
         public Task<bool> SendProjectDataToServer();
 
         public void AddStoryScriptPart(StoryPart storyPart);

@@ -1,7 +1,7 @@
 ﻿@inject IWorkspaceService _workspaceService
 @inject NavigationManager _navigationManager
 
-<h1>Storyscript parts</h1>
+<h3>storyscript.xml</h3>
 <div class="tab">
     <button style="@(tab1?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(1))">Story Parts (@_workspaceService.WorkClass.StoryScript.StoryParts.Count)</button>
     <button style="@(tab2?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(2))">Question Parts</button>

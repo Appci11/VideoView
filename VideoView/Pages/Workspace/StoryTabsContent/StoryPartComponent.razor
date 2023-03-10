@@ -4,53 +4,74 @@
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
-        <EditForm Model="storypart">
-            <h2>Story Part</h2><h2>Index = @storypartIndex</h2>
-            <div>
-                <label for="title">Title</label>
-                <InputText id="title" @bind-Value="storypart.Title" class="form-control" style="max-width:300px"></InputText>
-            </div>
-            <div>
-                <label for="name">Name</label>
-                <InputText id="name" @bind-Value="storypart.Name" class="form-control" style="max-width:300px" placeholder="aka Language"></InputText>
-            </div>
-            <div>
-                <label for="speech">Speech (uri to .mp3 audio file)</label>
-                <InputText id="speech" @bind-Value="storypart.Speech" class="form-control" style="max-width:300px"></InputText>
-            </div>
-            <hr />
-            <h2>Story Parts' Talking Points</h2>
-            @foreach (var item in storypart.Talks)
-            {
-                <div>
-                    <label for="txt">Text</label>
-                    <InputText id="txt" @bind-Value="item.Text" class="form-control" style="max-width:300px"></InputText>
-                </div>
-                <div>
-                    <label for="wait">Speech (time)</label>
-                    <InputNumber id="wait" @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
-                </div>
-            }
-            <br />
-            <button @onclick="AddTalkingPoint" class="btn btn-primary">More Talking Points</button>
-            <br />
-            <button @onclick="RemoveTalkingPoint" class="btn btn-primary">Less Talking Points</button>
+        <h2>Story Part (@storypart.Title)</h2>
+        <div>
+            <label for="title">Title (node tag value in .xml)</label>
+            <InputText id="title" @bind-Value="storypart.Title" class="form-control" style="max-width:300px"></InputText>
+        </div>
+        <div>
+            <label>
+                Language (name in .xml)
+                <InputSelect @bind-Value="storypart.Name" class="form-select" style="min-width:300px;">
+                    <option value="en">English</option>
+                    <option value="lt">Lithuanian</option>
+                </InputSelect>
+            </label>
+        </div>
+        <div>
+            <label>
+                Speech (base uri + .mp3 audio file name)
+                <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
+                <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="min-width:300px;">
 
+                    @if (_workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Count > 0)
+                    {
+                        <option value="" disabled default hidden>Previous files found</option>
+                        @foreach (string name in _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames)
+                        {
+                            <option value="@name">@name</option>
+                        }
+                        <option value="">None</option>
+                    }
+                    else
+                    {
+                        <option value="" disabled default hidden>Choose files</option>
+                    }
+                </InputSelect>
+                <InputFile OnChange="@LoadMp3FileNames" multiple />
+            </label>
             <br />
-            <br />
-            <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Story Part With Current Data</button>
-        </EditForm>
+            <i>in .xml @storypart.Speech</i>
+        </div>
         <br />
-        <button disabled="@editDeleteDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Part</button>
+        <h2>Story Parts' Talking Points</h2>
+        @foreach (var item in storypart.Talks)
+        {
+            <div>
+                <label>Text</label><br>
+                <InputText @bind-Value="item.Text" style="max-width:300px"></InputText>
+                <button @onclick="() => RemoveTalkingPoint(item)" class="btn btn-danger">Remove</button>
+            </div>
+            <div>
+                <label>Speech (time)</label><br>
+                <InputNumber @bind-Value="item.Wait" style="max-width:300px"></InputNumber>
+            </div>
+        }
         <br />
-        <button disabled="@editDeleteDisable" @onclick="RemoveCurrentlySelected" class="btn btn-danger">Remove Selected Story Part</button>
+        <button @onclick="AddTalkingPoint" class="btn btn-primary">More Talking Points</button>
         <br />
+        <br />
+        <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Story Part With Current Data</button>
+        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
+        <br />
+        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Part</button>
     </div>
     <!-- RIGHT SIDE -->
     <div>
         @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
         {
             <a style="cursor:pointer;" @onclick="(() => LoadSelected(item))">@item.Title</a>
+            <a style="cursor:pointer; color:red;" @onclick="(() => RemoveSelected(item))">remove</a>
             <br />
         }
     </div>
@@ -61,42 +82,118 @@
     public EventCallback Notify { get; set; }
 
     List<Talk> Talks = new List<Talk> { new Talk() };
-    StoryPart storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
+    StoryPart storypart = new StoryPart();
+
+    int sk = -1;
+    string mp3BaseUri = string.Empty;
+    string mp3BaseUriProperty
+    {
+        get
+        {
+            return mp3BaseUri;
+        }
+        set
+        {
+            mp3BaseUri = value;
+            storypart.Speech = mp3BaseUri + mp3FileName;
+        }
+    }
+    string mp3FileName = string.Empty;
+    string mp3FileNameProperty
+    {
+        get
+        {
+            return mp3FileName;
+        }
+        set
+        {
+            mp3FileName = value;
+            storypart.Speech = mp3BaseUri + mp3FileName;
+        }
+    }
+    bool clearOnSubmit = true;
 
     int storypartIndex = -1;
-    bool editDeleteDisable = true;
+    bool editDisable = true;
 
+    protected override Task OnInitializedAsync()
+    {
+        if (_workspaceService.WorkClass.StoryScript.StoryParts.Count > 0)
+        {
+            PrepareFieldsFromItem(_workspaceService.WorkClass.StoryScript.StoryParts.LastOrDefault<StoryPart>()!, false);
+        }
+        return base.OnInitializedAsync();
+    }
 
     void AddTalkingPoint()
     {
         storypart.Talks.Add(new Talk());
     }
 
-    void RemoveTalkingPoint()
+    void RemoveTalkingPoint(Talk item)
     {
-        storypart.Talks.RemoveAt(storypart.Talks.Count - 1);
+        storypart.Talks.Remove(item);
     }
 
     void LoadSelected(StoryPart item)
     {
-        StoryPart temp = new StoryPart();
-        temp.Title = item.Title;
-        temp.Name = item.Name;
-        temp.Speech = item.Speech;
-        foreach (Talk talk in item.Talks)
-        {
-            temp.Talks.Add(talk);
-        }
-        storypart = temp;
+        PrepareFieldsFromItem(item, true);
         storypartIndex = _workspaceService.WorkClass.StoryScript.StoryParts.FindIndex((x) => x.Equals(item));
-        editDeleteDisable = false;
+        storypart.Talks = _workspaceService.WorkClass.StoryScript.StoryParts[storypartIndex].Talks;
+        editDisable = false;
+    }
+
+    void PrepareFieldsFromItem(StoryPart item, bool existing)
+    {
+        storypart = new StoryPart();
+        if (item.Title.Contains("_"))
+        {
+            int vt = item.Title.LastIndexOf("_");
+            bool isNumber = int.TryParse(item.Title.Substring(vt + 1), out sk);
+            if (isNumber)
+            {
+                storypart.Title = item.Title.Substring(0, vt + 1) + (sk = existing ? sk : ++sk);
+            }
+            else storypart.Title = string.Empty;
+        }
+        else storypart.Title = string.Empty;
+        storypart.Name = item.Name;
+        if (item.Speech != null && item.Speech.Contains($"/"))
+        {
+            int vt = item.Speech.LastIndexOf($"/");
+            mp3BaseUri = item.Speech.Substring(0, vt + 1);
+            mp3FileName = item.Speech.Substring(vt + 1);
+        }
+        else
+        {
+            mp3BaseUri = string.Empty;
+            mp3FileName = string.Empty;
+        }
+        storypart.Speech = item.Speech;
+
+    }
+
+    async void RemoveSelected(StoryPart item)
+    {
+        _workspaceService.WorkClass.StoryScript.StoryParts.Remove(item);
+        editDisable = true;
+        await Notify.InvokeAsync();
     }
 
     async void HandleSubmit()
     {
         _workspaceService.AddStoryScriptPart(storypart);
-        storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
-        editDeleteDisable = true;
+        if (clearOnSubmit)
+        {
+            storypart = new StoryPart();
+            mp3BaseUri = string.Empty;
+            mp3FileName = string.Empty;
+        }
+        else
+        {
+            PrepareFieldsFromItem(storypart, true);
+        }
+        editDisable = true;
         storypartIndex = -1;
         await Notify.InvokeAsync();
     }
@@ -104,14 +201,19 @@
     void EditCurrentlySelected()
     {
         _workspaceService.UpdateStoryScriptPart(storypart, storypartIndex);
+        editDisable = true;
     }
 
-    async void RemoveCurrentlySelected()
+    void LoadMp3FileNames(InputFileChangeEventArgs e)
     {
-        _workspaceService.RemoveStoryScriptPart(storypartIndex);
-        storypart = new StoryPart { Talks = new List<Talk> { new Talk() } };
-        editDeleteDisable = true;
-        storypartIndex = -1;
-        await Notify.InvokeAsync();
+        _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames = new List<string>();
+        foreach (var file in e.GetMultipleFiles(200))
+        {
+            try
+            {
+                _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Add(file.Name);
+            }
+            catch { }
+        }
     }
 }

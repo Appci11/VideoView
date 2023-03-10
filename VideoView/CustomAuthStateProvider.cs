@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using VideoView.Services.AuthService;
 
 namespace VideoView
 {
@@ -13,6 +14,7 @@ namespace VideoView
         {
             _localStorage = localStorage;
             _http = http;
+            
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {

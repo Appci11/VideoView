@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using VideoView.Models.Category;
 @using VideoView.Models.Project;
+@using VideoView.Services.AuthService;
 @using VideoView.Services.CategoriesService;
 @using VideoView.Services.ProjectsService;
 @using VideoView.Services.WorkspaceService;
@@ -10,52 +11,52 @@
 @inject ICategoriesService _categoriesService
 @inject IProjectsService _projectsService
 @inject IWorkspaceService _workspaceService
+@inject IAuthService _authService
+@inject ILocalStorageService _localStorage
 
 <AuthorizeView>
     <NotAuthorized>
         <div class="d-grid gap-2">
             <button type="button" class="btn btn-outline-secondary" @onclick="GoToLogin">Prisijungti</button>
         </div>
-        @*
-        <-------VELIAU
-        <br />
-        <button type="button" class="btn btn-outline-secondary" @onclick="OpenFileUpload">Dirbti neprisijungus</button>
-        <br />
-        @if(anonymousWork)
-        {
-
-        }
-        *@
     </NotAuthorized>
     <Authorized>
-        @if (categoriesExist)
+        @if(loaded)
         {
-            <label for="category">Rastos kategorijos</label>
-            <select id="category" class="form-select"@onchange="GetProjects">
-                <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
-                @foreach (Category category in Categories!)
-                {
-                    <option value="@category.name">@category.fields.name.stringValue</option>
-                }
-            </select>
-            <br />
-            <label for="project">Rasti projektai</label>
-            <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
-                <option value="" selected disabled hidden>Pasirinkti projektą</option>
-                @if (Projects != null)
-                {
-                    @foreach (Project project in Projects!)
+            @if (categoriesExist)
+            {
+                <label for="category">Rastos kategorijos</label>
+                <select id="category" class="form-select" @onchange="GetProjects">
+                    <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
+                    @foreach (Category category in Categories!)
                     {
-                        <option value="@project.name">@project.fields.name.stringValue</option>
+                        <option value="@category.name">@category.fields.name.stringValue</option>
                     }
-                }
-            </select>
+                </select>
+                <br />
+                <label for="project">Rasti projektai</label>
+                <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
+                    <option value="" selected disabled hidden>Pasirinkti projektą</option>
+                    @if (Projects != null)
+                    {
+                        @foreach (Project project in Projects!)
+                        {
+                            <option value="@project.name">@project.fields.name.stringValue</option>
+                        }
+                    }
+                </select>
+                <br />
+                <div>
+                    @errorText
+                </div>
+                <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
+            }
         }
-        <br />
-        <div>
-            @errorText
-        </div>
-        <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
+        else
+        {
+            <a>Getting data from database...</a>
+        }
+
 
     </Authorized>
 </AuthorizeView>
@@ -75,6 +76,7 @@ Welcome to your new app.
     List<Project>? Projects;
     string ProjectId { get; set; } = string.Empty;
 
+    bool loaded = false;
     bool categoriesExist = false;
     bool projectsSelectionDisabled = true;
     bool goToWorkspaceDisabled = true;
@@ -83,6 +85,12 @@ Welcome to your new app.
 
     protected override async Task OnInitializedAsync()
     {
+        if(await _localStorage.GetItemAsync<DateTime>("idTokenExpirationDate") < DateTime.Now)
+        {
+            await _authService.RefreshTokens();
+        }
+
+        await _authService.RefreshTokens();
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         if (user.Identity is not null && user.Identity.IsAuthenticated)
@@ -97,6 +105,7 @@ Welcome to your new app.
         {
             errorText = "Nerasta nei viena kategorija.";
         }
+        loaded = true;
     }
 
     async void GetProjects(ChangeEventArgs e)
@@ -131,6 +140,6 @@ Welcome to your new app.
     {
         _workspaceService.CategoryId = CategoryId;
         _workspaceService.ProjectId = ProjectId;
-        _navigationManager.NavigateTo("workspace");
+        _navigationManager.NavigateTo($"/workspace/{CategoryId}/{ProjectId}");
     }
 }
