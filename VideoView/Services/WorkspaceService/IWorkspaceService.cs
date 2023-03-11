@@ -20,6 +20,10 @@ namespace VideoView.Services.WorkspaceService
         public void UpdateStoryScriptPart(StoryPart storyPart, int index);
         public void RemoveStoryScriptPart(int index);
 
+        public void AddStoryScriptQuizPart(QuizPart quizPart);
+        public void UpdateStoryScriptQuizPart(QuizPart quizPart, int index);
+        public void RemoveStoryScriptQuizPart(int index);
+
     }
 
     

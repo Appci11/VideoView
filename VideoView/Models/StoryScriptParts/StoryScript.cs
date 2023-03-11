@@ -2,7 +2,9 @@
 {
     public class StoryScript
     {
-        public List<string> StoryPartsAudioFileNames { get; set; } = new List<string>();
         public List<StoryPart> StoryParts { get; set; } = new List<StoryPart>();
+        public List<string> StoryPartsAudioFileNames { get; set; } = new List<string>();
+        public List<QuizPart> QuizParts { get; set; } = new List<QuizPart>();
+        public List<string> QuizPartsAudioFileNames { get; set; } = new List<string>();
     }
 }

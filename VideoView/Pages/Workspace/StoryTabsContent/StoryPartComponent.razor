@@ -1,4 +1,4 @@
-﻿@using VideoView.Models.StoryScriptParts;
+﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
 <div class="grid-container">
@@ -22,8 +22,7 @@
             <label>
                 Speech (base uri + .mp3 audio file name)
                 <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
-                <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="min-width:300px;">
-
+                <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="max-width:300px;">
                     @if (_workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Count > 0)
                     {
                         <option value="" disabled default hidden>Previous files found</option>
@@ -38,23 +37,24 @@
                         <option value="" disabled default hidden>Choose files</option>
                     }
                 </InputSelect>
-                <InputFile OnChange="@LoadMp3FileNames" multiple />
             </label>
             <br />
             <i>in .xml @storypart.Speech</i>
         </div>
         <br />
-        <h2>Story Parts' Talking Points</h2>
+        <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
+        <hr />
+        <h4>Talking Points</h4>
         @foreach (var item in storypart.Talks)
         {
             <div>
                 <label>Text</label><br>
-                <InputText @bind-Value="item.Text" style="max-width:300px"></InputText>
+                <InputText @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
                 <button @onclick="() => RemoveTalkingPoint(item)" class="btn btn-danger">Remove</button>
             </div>
             <div>
                 <label>Speech (time)</label><br>
-                <InputNumber @bind-Value="item.Wait" style="max-width:300px"></InputNumber>
+                <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
             </div>
         }
         <br />
@@ -81,8 +81,8 @@
     [Parameter]
     public EventCallback Notify { get; set; }
 
-    List<Talk> Talks = new List<Talk> { new Talk() };
     StoryPart storypart = new StoryPart();
+    List<Talk> Talks = new List<Talk> { new Talk() };    
 
     int sk = -1;
     string mp3BaseUri = string.Empty;
@@ -111,8 +111,8 @@
             storypart.Speech = mp3BaseUri + mp3FileName;
         }
     }
-    bool clearOnSubmit = true;
 
+    bool clearOnSubmit = true;
     int storypartIndex = -1;
     bool editDisable = true;
 
@@ -139,7 +139,11 @@
     {
         PrepareFieldsFromItem(item, true);
         storypartIndex = _workspaceService.WorkClass.StoryScript.StoryParts.FindIndex((x) => x.Equals(item));
-        storypart.Talks = _workspaceService.WorkClass.StoryScript.StoryParts[storypartIndex].Talks;
+        storypart.Talks = new List<Talk>();
+        foreach (Talk talk in _workspaceService.WorkClass.StoryScript.StoryParts[storypartIndex].Talks)
+        {
+            storypart.Talks.Add(talk);
+        }
         editDisable = false;
     }
 
@@ -170,7 +174,6 @@
             mp3FileName = string.Empty;
         }
         storypart.Speech = item.Speech;
-
     }
 
     async void RemoveSelected(StoryPart item)

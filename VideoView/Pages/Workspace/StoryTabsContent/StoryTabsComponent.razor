@@ -4,7 +4,7 @@
 <h3>storyscript.xml</h3>
 <div class="tab">
     <button style="@(tab1?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(1))">Story Parts (@_workspaceService.WorkClass.StoryScript.StoryParts.Count)</button>
-    <button style="@(tab2?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(2))">Question Parts</button>
+    <button style="@(tab2?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(2))">Question Parts (@_workspaceService.WorkClass.StoryScript.QuizParts.Count)</button>
     <button style="@(tab3?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(3))">Story Menu</button>
     <button style="@(tab4?"background-color:#808080;color:white;":"")" @onclick="(x => DisplayTab(4))">Story Observer</button>
 
@@ -18,7 +18,7 @@
 @if (tab2)
 {
     <div class="tabcontent">
-        <h3>Tab2</h3>
+        <QuizPartComponent Notify="NotifyAboutChanges"></QuizPartComponent>
     </div>
 }
 @if (tab3)
@@ -75,7 +75,6 @@
 
     void NotifyAboutChanges()
     {
-        Console.WriteLine("CHILD SAID HI");
         StateHasChanged();
     }
 }

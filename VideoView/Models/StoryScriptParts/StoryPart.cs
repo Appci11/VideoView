@@ -10,6 +10,7 @@
 
     public class Talk
     {
+        // Has "Name". Skipped here. Generated automatically in .xml
         public string Text { get; set; } = String.Empty;
         public double Wait { get; set; }
     }

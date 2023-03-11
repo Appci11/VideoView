@@ -33,7 +33,7 @@ namespace VideoView.Services.WorkspaceService
             CategoryName = category.fields.name.stringValue;
             Project = await _projectsService.GetProjectById(categoryId, projectId);
             projectName = Project.fields.name.stringValue;
-            if(Project.fields.blobFile.bytesValue.Length > 0)
+            if (Project.fields.blobFile.bytesValue.Length > 0)
             {
                 WorkClass = ByteToObj<WorkClass>(Project.fields.blobFile.bytesValue);
             }
@@ -62,9 +62,9 @@ namespace VideoView.Services.WorkspaceService
             // Need a new copy...
             StoryPart temp = new StoryPart();
             temp.Title = storyPart.Title;
-            temp.Name= storyPart.Name;
+            temp.Name = storyPart.Name;
             temp.Speech = storyPart.Speech;
-            foreach(Talk item in storyPart.Talks)
+            foreach (Talk item in storyPart.Talks)
             {
                 temp.Talks.Add(item);
             }
@@ -73,20 +73,53 @@ namespace VideoView.Services.WorkspaceService
 
         public void UpdateStoryScriptPart(StoryPart storyPart, int index)
         {
-            Console.WriteLine();
             // Need a new copy...
-            this.WorkClass.StoryScript.StoryParts[index].Title = storyPart.Title;
-            this.WorkClass.StoryScript.StoryParts[index].Name = storyPart.Name;
-            this.WorkClass.StoryScript.StoryParts[index].Speech = storyPart.Speech;
-            this.WorkClass.StoryScript.StoryParts[index].Talks.Clear();
+            WorkClass.StoryScript.StoryParts[index].Title = storyPart.Title;
+            WorkClass.StoryScript.StoryParts[index].Name = storyPart.Name;
+            WorkClass.StoryScript.StoryParts[index].Speech = storyPart.Speech;
+            WorkClass.StoryScript.StoryParts[index].Talks.Clear();
             foreach (Talk item in storyPart.Talks)
             {
-                this.WorkClass.StoryScript.StoryParts[index].Talks.Add(item);
+                WorkClass.StoryScript.StoryParts[index].Talks.Add(item);
             }
         }
         public void RemoveStoryScriptPart(int index)
         {
             this.WorkClass.StoryScript.StoryParts.RemoveAt(index);
+        }
+
+        public void AddStoryScriptQuizPart(QuizPart quizPart)
+        {
+            // Making new copy
+            QuizPart temp = new QuizPart();
+            temp.Title = quizPart.Title;
+            temp.Name = quizPart.Name;
+            temp.Nr = quizPart.Nr;
+            temp.CorrectNr = quizPart.CorrectNr;
+            foreach (Option item in quizPart.Options)
+            {
+                temp.Options.Add(item);
+            }
+            WorkClass.StoryScript.QuizParts.Add(temp);
+        }
+
+        public void UpdateStoryScriptQuizPart(QuizPart quizPart, int index)
+        {
+            // yep, new copy again...
+            WorkClass.StoryScript.QuizParts[index].Title = quizPart.Title;
+            WorkClass.StoryScript.QuizParts[index].Name = quizPart.Name;
+            WorkClass.StoryScript.QuizParts[index].Nr = quizPart.Nr;
+            WorkClass.StoryScript.QuizParts[index].CorrectNr = quizPart.CorrectNr;
+            WorkClass.StoryScript.QuizParts[index].Options.Clear();
+            foreach (Option item in quizPart.Options)
+            {
+                WorkClass.StoryScript.QuizParts[index].Options.Add(item);
+            }
+        }
+
+        public void RemoveStoryScriptQuizPart(int index)
+        {
+            WorkClass.StoryScript.QuizParts.RemoveAt(index);
         }
     }
 }

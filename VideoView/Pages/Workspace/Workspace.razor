@@ -55,10 +55,17 @@ else
     public async void DownloadFile()
     {
         XDocument xmlDocument = CreateXmlFile();
+
         foreach (StoryPart item in _workspaceService.WorkClass.StoryScript.StoryParts)
         {
             XElement element = CreateStoryPartElement(item);
-            AddStoryPart(xmlDocument, element);
+            AddNodeToRoot(xmlDocument, element);
+        }
+
+        foreach (QuizPart item in _workspaceService.WorkClass.StoryScript.QuizParts)
+        {
+            XElement element = CreateQuizPartElement(item);
+            AddNodeToRoot(xmlDocument, element);
         }
 
         //Console.WriteLine(xmlDocument.ToString());
@@ -100,7 +107,45 @@ else
         elem.Add(elements);
         return elem;
     }
-    static void AddStoryPart(XDocument doc, XElement elem)
+    static XElement CreateQuizPartElement(QuizPart qPart)
+    {
+        XElement elem;  // atskirai, netycia gali salygos veliau prireikt
+        elem = new XElement(qPart.Title,
+                                new XAttribute("name", qPart.Name),
+                                new XAttribute("nr", qPart.Nr),
+                                new XAttribute("correct_nr", qPart.CorrectNr));
+        List<XElement> elements = new List<XElement>();
+        int i = 1;
+        foreach (Option o in qPart.Options)
+        {
+            if (o.Speech != null && o.Speech.Length > 3)
+            {
+                elements.Add(new XElement("option",
+                                new XAttribute("name", $"o{i}"),
+                                new XAttribute("ox", o.OX),
+                                new XAttribute("oy", o.OY),
+                                new XAttribute("text", o.Text),
+                                new XAttribute("istrue", o.IsTrue.ToString()),
+                                new XAttribute("answer", o.Answer),
+                                new XAttribute("wait", o.Wait),
+                                new XAttribute("speech", o.Speech)));
+            }
+            else
+            {
+                elements.Add(new XElement("option",
+                                new XAttribute("name", $"o{i}"),
+                                new XAttribute("ox", o.OX),
+                                new XAttribute("oy", o.OY),
+                                new XAttribute("text", o.Text),
+                                new XAttribute("istrue", o.IsTrue.ToString()),
+                                new XAttribute("answer", o.Answer),
+                                new XAttribute("wait", o.Wait)));
+            }
+        }
+        elem.Add(elements);
+        return elem;
+    }
+    static void AddNodeToRoot(XDocument doc, XElement elem)
     {
         doc.Root.Add(elem);
     }
