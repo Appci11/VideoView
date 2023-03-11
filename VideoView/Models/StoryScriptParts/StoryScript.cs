@@ -6,5 +6,7 @@
         public List<string> StoryPartsAudioFileNames { get; set; } = new List<string>();
         public List<QuizPart> QuizParts { get; set; } = new List<QuizPart>();
         public List<string> QuizPartsAudioFileNames { get; set; } = new List<string>();
+        public List<StoryMenuPart> StoryMenuParts { get; set;} = new List<StoryMenuPart>();
+        public List<StoryObserverPart> StoryObserverParts { get; set;} = new List<StoryObserverPart>();
     }
 }

@@ -24,7 +24,12 @@ namespace VideoView.Services.WorkspaceService
         public void UpdateStoryScriptQuizPart(QuizPart quizPart, int index);
         public void RemoveStoryScriptQuizPart(int index);
 
-    }
+        public void AddStoryScriptStoryMenuPart(StoryMenuPart storyMenuPart);
+        public void UpdateStoryScriptStoryMenuPart(StoryMenuPart storyMenuPart, int index);
+        public void RemoveStoryScriptStoryMenuPart(int index);
 
-    
+        public void AddStoryScriptStoryObserverPart(StoryObserverPart storyObserverPart);
+        public void UpdateStoryScriptStoryObserverPart(StoryObserverPart storyObserverPart, int index);
+        public void RemoveStoryScriptStoryObserverPart(int index);
+    }    
 }

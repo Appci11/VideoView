@@ -30,88 +30,75 @@
         <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
         <hr />
         <h4>Quiz options to pick</h4>
-        @{
-            foreach (var item in quizpart.Options)
-            {
-                <div>
-                    <label>ox</label><br>
-                    <InputNumber @bind-Value="item.OX" class="form-control" style="max-width:300px"></InputNumber>
-                </div>
-                <div>
-                    <label>oy</label><br>
-                    <InputNumber @bind-Value="item.OY" class="form-control" style="max-width:300px"></InputNumber>
-                </div>
-                <div>
-                    <label for="text">Quiz question text</label>
-                    <InputText id="text" @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
-                </div>
-                <div>
-                    <label>
-                        Is current option correct
-                        <InputSelect @bind-Value="item.IsTrue" class="form-select" style="min-width:300px;">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </InputSelect>
-                    </label>
-                </div>
-                <div>
-                    <label for="answer">Answer on selecting current option</label>
-                    <InputText id="answer" @bind-Value="item.Answer" class="form-control" style="max-width:300px;"></InputText>
-                </div>
-                <div>
-                    <label>Wait time</label><br>
-                    <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
-                </div>
+        @foreach (var item in quizpart.Options)
+        {
+            <div>
+                <label>ox</label><br>
+                <InputNumber @bind-Value="item.OX" class="form-control" style="max-width:300px"></InputNumber>
+                <button @onclick="() => RemoveQuizOption(item)" class="btn btn-danger">Remove</button>
+            </div>
+            <div>
+                <label>oy</label><br>
+                <InputNumber @bind-Value="item.OY" class="form-control" style="max-width:300px"></InputNumber>
+            </div>
+            <div>
+                <label for="text">Quiz question text</label>
+                <InputText id="text" @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
+            </div>
+            <div>
                 <label>
-                    Speech (base uri + .mp3 audio file name)
-                    <InputText @bind-Value="item.Mp3BaseUri" placeholder="Base uri (can be empty)" class="form-control" style="max-width:300px"></InputText>
-                    <InputSelect @bind-Value="item.Mp3FileName" class="form-select" style="max-width:300px;">
-                        @if (_workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames.Count > 0)
-                        {
-                            <option value="" disabled default hidden>Previous files found</option>
-                            @foreach (string name in _workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames)
-                            {
-                                <option value="@name">@name</option>
-                            }
-                            <option value="">None</option>
-                        }
-                        else
-                        {
-                            <option value="" disabled default hidden>Choose files (can be skipped)</option>
-                        }
+                    Is current option correct
+                    <InputSelect @bind-Value="item.IsTrue" class="form-select" style="min-width:300px;">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
                     </InputSelect>
-                    <br/>
-                    <a>in .xml @item.Speech</a>
                 </label>
-
-
-
-
-
-
-
-
-
-
-
-
-            }
-            <br />
-            <button @onclick="AddQuizOption" class="btn btn-primary">More Options</button>
-            <br />
-            <br />
-            <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Quiz Part With Current Data</button>
-            <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
-            <br />
-            <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Quiz Part</button>
+            </div>
+            <div>
+                <label for="answer">Answer on selecting current option</label>
+                <InputText id="answer" @bind-Value="item.Answer" class="form-control" style="max-width:300px;"></InputText>
+            </div>
+            <div>
+                <label>Wait time</label><br>
+                <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
+            </div>
+            <label>
+                Speech (base uri + .mp3 audio file name)
+                <InputText @bind-Value="item.Mp3BaseUri" placeholder="Base uri (can be empty)" class="form-control" style="max-width:300px"></InputText>
+                <InputSelect @bind-Value="item.Mp3FileName" class="form-select" style="max-width:300px;">
+                    @if (_workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames.Count > 0)
+                    {
+                        <option value="" disabled default hidden>Previous files found</option>
+                        @foreach (string name in _workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames)
+                        {
+                            <option value="@name">@name</option>
+                        }
+                        <option value="">None</option>
+                    }
+                    else
+                    {
+                        <option value="" disabled default hidden>Choose files (can be skipped)</option>
+                    }
+                </InputSelect>
+                <i>in .xml @item.Speech</i>
+            </label>
         }
+        <br />
+        <br />
+        <button @onclick="AddQuizOption" class="btn btn-primary">More Options</button>
+        <br />
+        <br />
+        <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Quiz Part With Current Data</button>
+        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
+        <br />
+        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Quiz Part</button>
     </div>
     <!-- RIGHT SIDE -->
     <div>
         @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
         {
             <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
-            <a @onclick="(() => RemoveSelected(item))" style="cursos:pointer; color:red;">remove</a>
+            <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
             <br />
         }
     </div>
@@ -121,36 +108,36 @@
     [Parameter]
     public EventCallback Notify { get; set; }
 
-    List<Option> Options = new List<Option> { new Option { } };
+    //List<Option> Options = new List<Option> { new Option { } };
     QuizPart quizpart = new QuizPart();
 
     int sk = -1;
-    string mp3BaseUri = string.Empty;
-    string mp3BaseUriProperty
-    {
-        get
-        {
-            return mp3BaseUri;
-        }
-        set
-        {
-            mp3BaseUri = value;
-            // iterpimui
-        }
-    }
-    string mp3FileName = string.Empty;
-    string mp3FileNameProperty
-    {
-        get
-        {
-            return mp3FileName;
-        }
-        set
-        {
-            mp3FileName = value;
-            // iterpimui
-        }
-    }
+    //string mp3BaseUri = string.Empty;
+    //string mp3BaseUriProperty
+    //{
+    //    get
+    //    {
+    //        return mp3BaseUri;
+    //    }
+    //    set
+    //    {
+    //        mp3BaseUri = value;
+    //        // iterpimui
+    //    }
+    //}
+    //string mp3FileName = string.Empty;
+    //string mp3FileNameProperty
+    //{
+    //    get
+    //    {
+    //        return mp3FileName;
+    //    }
+    //    set
+    //    {
+    //        mp3FileName = value;
+    //        // iterpimui
+    //    }
+    //}
     bool clearOnSubmit = true;
     int quizpartIndex = -1;
     bool editDisable = true;
@@ -204,6 +191,7 @@
         quizpart.Nr = item.Nr;
         quizpart.CorrectNr = item.CorrectNr;
         // maybe add some things for options here?
+        // or not, the rest loaded elswhere
     }
 
     async void RemoveSelected(QuizPart item)
@@ -219,8 +207,8 @@
         if (clearOnSubmit)
         {
             quizpart = new QuizPart();
-            mp3BaseUri = string.Empty;
-            mp3FileName = string.Empty;
+            //mp3BaseUri = string.Empty;
+            //mp3FileName = string.Empty;
         }
         else
         {

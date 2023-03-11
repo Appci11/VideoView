@@ -1,0 +1,93 @@
+﻿@using VideoView.Models.StoryScriptParts
+@inject IWorkspaceService _workspaceService
+
+<div class="grid-container">
+    <!-- LEFT SIDE -->
+    <div>
+    </div>
+    <!-- RIGHT SIDE -->
+    <div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback Notify { get; set; }
+
+    StoryObserverPart storyobserverpart = new StoryObserverPart();
+
+    int sk = -1;
+    bool clearOnSubmit = true;
+    int storyobserverpartIndex = -1;
+    bool editDisable = true;
+
+    protected override Task OnInitializedAsync()
+    {
+        if (_workspaceService.WorkClass.StoryScript.StoryObserverParts.Count > 0)
+        {
+            //PrepareFieldsFromItem
+        }
+        return base.OnInitializedAsync();
+    }
+
+    void AddPeriod()
+    {
+        storyobserverpart.Periods.Add(new Period());
+    }
+
+    void RemovePeriod(Period item)
+    {
+        storyobserverpart.Periods.Remove(item);
+    }
+
+    void LoadSelected(StoryObserverPart item)
+    {
+        PrepareFieldsFromItem(item, true);
+        storyobserverpartIndex = _workspaceService.WorkClass.StoryScript.StoryObserverParts.FindIndex((x) => x.Equals(item));
+        storyobserverpart.Periods = new List<Period>();
+        foreach (Period period in _workspaceService.WorkClass.StoryScript.StoryObserverParts[storyobserverpartIndex].Periods)
+        {
+            storyobserverpart.Periods.Add(period);
+        }
+        editDisable = false;
+    }
+
+    void PrepareFieldsFromItem(StoryObserverPart item, bool existing)
+    {
+        storyobserverpart = new StoryObserverPart();
+        if (existing)
+        {
+            storyobserverpart.Title = item.Title;
+        }
+        else { storyobserverpart.Title = string.Empty; }
+    }
+
+    async void RemoveSelected(StoryObserverPart item)
+    {
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts.Remove(item);
+        editDisable = true;
+        await Notify.InvokeAsync();
+    }
+
+    async void HandleSubmit()
+    {
+        _workspaceService.AddStoryScriptStoryObserverPart(storyobserverpart);
+        if (clearOnSubmit)
+        {
+            storyobserverpart = new StoryObserverPart();
+        }
+        else
+        {
+            PrepareFieldsFromItem(storyobserverpart, true);
+        }
+        editDisable = true;
+        storyobserverpartIndex = -1;
+        await Notify.InvokeAsync();
+    }
+
+    void EditCurrentlySelected()
+    {
+        _workspaceService.UpdateStoryScriptStoryObserverPart(storyobserverpart, storyobserverpartIndex);
+        editDisable = true;
+    }
+}

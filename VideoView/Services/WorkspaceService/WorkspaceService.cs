@@ -105,7 +105,7 @@ namespace VideoView.Services.WorkspaceService
 
         public void UpdateStoryScriptQuizPart(QuizPart quizPart, int index)
         {
-            // yep, new copy again...
+            // copying values not pointers
             WorkClass.StoryScript.QuizParts[index].Title = quizPart.Title;
             WorkClass.StoryScript.QuizParts[index].Name = quizPart.Name;
             WorkClass.StoryScript.QuizParts[index].Nr = quizPart.Nr;
@@ -121,5 +121,61 @@ namespace VideoView.Services.WorkspaceService
         {
             WorkClass.StoryScript.QuizParts.RemoveAt(index);
         }
+
+        public void AddStoryScriptStoryMenuPart(StoryMenuPart storyMenuPart)
+        {
+            StoryMenuPart temp = new StoryMenuPart();
+            temp.Title = storyMenuPart.Title;
+            temp.Name = storyMenuPart.Name;
+            foreach (Menu item in storyMenuPart.Menus)
+            {
+                temp.Menus.Add(item);
+            }
+            WorkClass.StoryScript.StoryMenuParts.Add(temp);
+        }
+
+        public void UpdateStoryScriptStoryMenuPart(StoryMenuPart storyMenuPart, int index)
+        {
+            WorkClass.StoryScript.StoryMenuParts[index].Title = storyMenuPart.Title;
+            WorkClass.StoryScript.StoryMenuParts[index].Name = storyMenuPart.Name;
+            WorkClass.StoryScript.StoryMenuParts[index].Menus.Clear();
+            foreach (Menu item in storyMenuPart.Menus)
+            {
+                WorkClass.StoryScript.StoryMenuParts[index].Menus.Add(item);
+            }
+
+        }
+
+        public void RemoveStoryScriptStoryMenuPart(int index)
+        {
+            WorkClass.StoryScript.StoryMenuParts.RemoveAt(index);
+        }
+
+        public void AddStoryScriptStoryObserverPart(StoryObserverPart storyObserverPart)
+        {
+            StoryObserverPart temp = new StoryObserverPart();
+            temp.Title = storyObserverPart.Title;
+            foreach (Period item in storyObserverPart.Periods)
+            {
+                temp.Periods.Add(item);
+            }
+            WorkClass.StoryScript.StoryObserverParts.Add(temp);
+        }
+
+        public void UpdateStoryScriptStoryObserverPart(StoryObserverPart storyObserverPart, int index)
+        {
+            WorkClass.StoryScript.StoryObserverParts[index].Title = storyObserverPart.Title;
+            WorkClass.StoryScript.StoryObserverParts[index].Periods.Clear();
+            foreach (Period item in storyObserverPart.Periods)
+            {
+                WorkClass.StoryScript.StoryObserverParts[index].Periods.Add(item);
+            }
+        }
+
+        public void RemoveStoryScriptStoryObserverPart(int index)
+        {
+            WorkClass.StoryScript.StoryObserverParts.RemoveAt(index);
+        }
+
     }
 }
