@@ -155,6 +155,7 @@ namespace VideoView.Services.WorkspaceService
         {
             StoryObserverPart temp = new StoryObserverPart();
             temp.Title = storyObserverPart.Title;
+            temp.VideoUri = storyObserverPart.VideoUri;
             foreach (Period item in storyObserverPart.Periods)
             {
                 temp.Periods.Add(item);
@@ -165,6 +166,7 @@ namespace VideoView.Services.WorkspaceService
         public void UpdateStoryScriptStoryObserverPart(StoryObserverPart storyObserverPart, int index)
         {
             WorkClass.StoryScript.StoryObserverParts[index].Title = storyObserverPart.Title;
+            WorkClass.StoryScript.StoryObserverParts[index].VideoUri = storyObserverPart.VideoUri;
             WorkClass.StoryScript.StoryObserverParts[index].Periods.Clear();
             foreach (Period item in storyObserverPart.Periods)
             {

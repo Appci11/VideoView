@@ -3,6 +3,7 @@
     public class StoryObserverPart
     {
         public string Title { get; set; } = "story_observer";
+        public string VideoUri { get; set; } = string.Empty;
         public List<Period> Periods { get; set; } = new List<Period>();
     }
 

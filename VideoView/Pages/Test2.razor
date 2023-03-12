@@ -1,0 +1,20 @@
+﻿@page "/test2"
+
+@inject IJSRuntime _jsRuntime
+
+<div id="player"></div>
+
+<button @onclick="LoadPlayer">LoadPlayer</button>
+<button @onclick="GetTime">GetTime</button>
+
+@code {
+
+    async void LoadPlayer()
+    {
+        await _jsRuntime.InvokeVoidAsync("initializePlayer", "Zp37voNDY_0");
+    }
+    async void GetTime()
+    {
+        await _jsRuntime.InvokeVoidAsync("getTime");
+    }
+}

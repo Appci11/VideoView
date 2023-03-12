@@ -1,12 +1,68 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
+@inject IJSRuntime _jsRuntime
 
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
+        <h2>Story Observer Part (@storyobserverpart.Title)</h2>
+        <div>
+            <div>
+                <label for="title">Title (node tag value in .xml)</label>
+                <InputText id="title" @bind-Value="storyobserverpart.Title" class="form-control" style="max-width:300px;"></InputText>
+            </div>
+            <hr />
+            <h4>Periods</h4>
+            @foreach (var item in storyobserverpart.Periods)
+            {
+                <div>
+                    <label>Time</label><br>
+                    <InputNumber @bind-Value="item.Time" class="form-control" style="max-width:300px"></InputNumber>
+                    <button @onclick="() => RemovePeriod(item)" class="btn btn-danger">Remove</button>
+                </div>
+                <label>
+                    Is Done
+                    <InputSelect @bind-Value="item.Done" class="form-select" style="min-width:300px;">
+                        <option value="true">Yes</option>
+                        <option default value="false">No</option>
+                    </InputSelect>
+                </label>
+                <div>
+                    <label for="exec">Exec</label>
+                    <InputText id="exec" @bind-Value="item.Exec" class="form-control" style="max-width:300px;"></InputText>
+                </div>
+            }
+            <br />
+            <button @onclick="AddPeriod" class="btn btn-primary">Add More Periods</button>
+            <br />
+            <br />
+            <button @onclick="HandleSubmit" class="btn btn-primary">Add New Story Observer Using Current Data</button>
+            <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
+            <br />
+            <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Menu Part</button>
+        </div>
     </div>
     <!-- RIGHT SIDE -->
     <div>
+        <div>
+            <!-- According to google docs <iframe> video throwing lots of errors is intended behaviour... so it does just that -->
+            <label for="vidurl">YouTube video url</label>
+            <InputText id="vidurl" @bind-Value="storyobserverpart.VideoUri" placeholder="example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control" style="max-width:500px;"></InputText>
+            <button class="btn btn-primary" @onclick="LoadVideo">Load Video</button>
+        </div>
+        <div>
+            <div id="player"></div>
+            <br />
+            <button class="btn btn-primary" @onclick="GetCurrentVideoTime">Add Period With Current Video Time</button>
+            
+        </div>
+        <hr />
+        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryObserverParts)
+        {
+            <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
+            <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
+            <br />
+        }
     </div>
 </div>
 
@@ -21,18 +77,34 @@
     int storyobserverpartIndex = -1;
     bool editDisable = true;
 
-    protected override Task OnInitializedAsync()
+    bool vidLoaded = false;
+    string vidId = string.Empty;
+
+    void LoadVideo()
     {
-        if (_workspaceService.WorkClass.StoryScript.StoryObserverParts.Count > 0)
-        {
-            //PrepareFieldsFromItem
-        }
-        return base.OnInitializedAsync();
+        string[] arr = storyobserverpart.VideoUri.Split("watch?v=");
+        vidId = arr[1];
+        Console.WriteLine("got into LoadVideo");
+        _jsRuntime.InvokeVoidAsync("initializePlayer", vidId);
+        vidLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task GetCurrentVideoTime()
+    {
+        double sk = await _jsRuntime.InvokeAsync<double>("getTime");
+        int sk1 = (int)sk;
+        AddPeriod(sk1);
     }
 
     void AddPeriod()
     {
         storyobserverpart.Periods.Add(new Period());
+    }
+
+    void AddPeriod(int sk)
+    {
+        storyobserverpart.Periods.Add(new Period { Time = sk });
     }
 
     void RemovePeriod(Period item)
@@ -55,6 +127,7 @@
     void PrepareFieldsFromItem(StoryObserverPart item, bool existing)
     {
         storyobserverpart = new StoryObserverPart();
+        storyobserverpart.VideoUri = item.VideoUri;
         if (existing)
         {
             storyobserverpart.Title = item.Title;
