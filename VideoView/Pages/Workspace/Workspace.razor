@@ -68,6 +68,18 @@ else
             AddNodeToRoot(xmlDocument, element);
         }
 
+        foreach(StoryMenuPart item in _workspaceService.WorkClass.StoryScript.StoryMenuParts)
+        {
+            XElement element = CreateStoryMenuPartElement(item);
+            AddNodeToRoot(xmlDocument, element);
+        }
+
+        foreach (StoryObserverPart item in _workspaceService.WorkClass.StoryScript.StoryObserverParts)
+        {
+            XElement element = CreateStoryObserverPartElement(item);
+            AddNodeToRoot(xmlDocument, element);
+        }
+
         //Console.WriteLine(xmlDocument.ToString());
         await JSRuntime.InvokeAsync<object>("saveFile", "FailoVardas.xml", xmlDocument.ToString());
     }
@@ -81,6 +93,7 @@ else
 
         return document;
     }
+
     static XElement CreateStoryPartElement(StoryPart sPart)
     {
         XElement elem;
@@ -107,6 +120,7 @@ else
         elem.Add(elements);
         return elem;
     }
+
     static XElement CreateQuizPartElement(QuizPart qPart)
     {
         XElement elem;  // atskirai, netycia gali salygos veliau prireikt
@@ -145,6 +159,45 @@ else
         elem.Add(elements);
         return elem;
     }
+
+    static XElement CreateStoryMenuPartElement(StoryMenuPart storyMenuPart)
+    {
+        XElement elem;
+        elem = new XElement(storyMenuPart.Title,
+                                new XAttribute("name", storyMenuPart.Name));
+        List<XElement> elements = new List<XElement>();
+        int i = 1;
+        foreach (Menu m in storyMenuPart.Menus)
+        {
+            elements.Add(new XElement("manu",
+                            new XAttribute("name", $"m{i++}"),
+                            new XAttribute("text", m.Text),
+                            new XAttribute("ox", m.OX),
+                            new XAttribute("oy", m.OY),
+                            new XAttribute("action", m.Action)));
+        }
+        elem.Add(elements);
+        return elem;
+    }
+
+    static XElement CreateStoryObserverPartElement(StoryObserverPart storyObserverPart)
+    {
+        XElement elem;
+        elem = new XElement(storyObserverPart.Title);
+        List<XElement> elements = new List<XElement>();
+        int i = 1;
+        foreach (Period p in storyObserverPart.Periods)
+        {
+            elements.Add(new XElement("manu",
+                            new XAttribute("name", $"p{i++}"),
+                            new XAttribute("time", p.Time),
+                            new XAttribute("done", p.Done),
+                            new XAttribute("exec", p.Exec)));
+        }
+        elem.Add(elements);
+        return elem;
+    }
+
     static void AddNodeToRoot(XDocument doc, XElement elem)
     {
         doc.Root.Add(elem);
