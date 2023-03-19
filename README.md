@@ -1,6 +1,6 @@
 #### Tarpine ataskaita1, diagramos(kai/jei bus)
 
-https://drive.google.com/drive/folders/1V8XIUaS1myfGRtlzhT12rpTpkgwpAVsz?usp=share_link
+https://drive.google.com/drive/folders/1V8XIUaS1myfGRtlzhT12rpTpkgwpAVsz?usp=sharing
 
 
 #### Nuoroda i projekta
