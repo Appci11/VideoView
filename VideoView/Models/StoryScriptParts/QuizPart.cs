@@ -21,27 +21,27 @@
         public double Wait { get; set; }
         public string? Speech { get; set; }
 
-        string mp3BaseUri = string.Empty;
-        string mp3FileName = string.Empty;
+        //string mp3BaseUri = string.Empty;
+        //string mp3FileName = string.Empty;
 
-        public string Mp3BaseUri
-        {
-            get { return mp3BaseUri; }
-            set
-            {
-                mp3BaseUri = value;
-                Speech = mp3BaseUri + mp3FileName;
-            }
-        }
+        //public string Mp3BaseUri
+        //{
+        //    get { return mp3BaseUri; }
+        //    set
+        //    {
+        //        mp3BaseUri = value;
+        //        Speech = mp3BaseUri + mp3FileName;
+        //    }
+        //}
 
-        public string Mp3FileName
-        {
-            get { return mp3FileName; }
-            set
-            {
-                mp3FileName = value;
-                Speech = mp3BaseUri + mp3FileName;
-            }
-        }
+        //public string Mp3FileName
+        //{
+        //    get { return mp3FileName; }
+        //    set
+        //    {
+        //        mp3FileName = value;
+        //        Speech = mp3BaseUri + mp3FileName;
+        //    }
+        //}
     }
 }

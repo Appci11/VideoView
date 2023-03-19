@@ -20,6 +20,13 @@
         </div>
         <div>
             <label>
+                Speech
+                <InputText @bind-Value="storypart.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
+            </label>
+        </div>
+@*
+        <div>
+            <label>
                 Speech (base uri + .mp3 audio file name)
                 <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
                 <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="max-width:300px;">
@@ -41,8 +48,11 @@
             <br />
             <i>in .xml @storypart.Speech</i>
         </div>
+*@
+@*
         <br />
         <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
+*@
         <hr />
         <h4>Talking Points</h4>
         @foreach (var item in storypart.Talks)
@@ -85,32 +95,32 @@
     //List<Talk> Talks = new List<Talk> { new Talk() };    
 
     int sk = -1;
-    string mp3BaseUri = string.Empty;
-    string mp3BaseUriProperty
-    {
-        get
-        {
-            return mp3BaseUri;
-        }
-        set
-        {
-            mp3BaseUri = value;
-            storypart.Speech = mp3BaseUri + mp3FileName;
-        }
-    }
-    string mp3FileName = string.Empty;
-    string mp3FileNameProperty
-    {
-        get
-        {
-            return mp3FileName;
-        }
-        set
-        {
-            mp3FileName = value;
-            storypart.Speech = mp3BaseUri + mp3FileName;
-        }
-    }
+    //string mp3BaseUri = string.Empty;
+    //string mp3BaseUriProperty
+    //{
+    //    get
+    //    {
+    //        return mp3BaseUri;
+    //    }
+    //    set
+    //    {
+    //        mp3BaseUri = value;
+    //        storypart.Speech = mp3BaseUri + mp3FileName;
+    //    }
+    //}
+    //string mp3FileName = string.Empty;
+    //string mp3FileNameProperty
+    //{
+    //    get
+    //    {
+    //        return mp3FileName;
+    //    }
+    //    set
+    //    {
+    //        mp3FileName = value;
+    //        storypart.Speech = mp3BaseUri + mp3FileName;
+    //    }
+    //}
 
     bool clearOnSubmit = true;
     int storypartIndex = -1;
@@ -162,17 +172,17 @@
         }
         else storypart.Title = string.Empty;
         storypart.Name = item.Name;
-        if (item.Speech != null && item.Speech.Contains($"/"))
-        {
-            int vt = item.Speech.LastIndexOf($"/");
-            mp3BaseUri = item.Speech.Substring(0, vt + 1);
-            mp3FileName = item.Speech.Substring(vt + 1);
-        }
-        else
-        {
-            mp3BaseUri = string.Empty;
-            mp3FileName = string.Empty;
-        }
+        //if (item.Speech != null && item.Speech.Contains($"/"))
+        //{
+        //    int vt = item.Speech.LastIndexOf($"/");
+        //    mp3BaseUri = item.Speech.Substring(0, vt + 1);
+        //    mp3FileName = item.Speech.Substring(vt + 1);
+        //}
+        //else
+        //{
+        //    mp3BaseUri = string.Empty;
+        //    mp3FileName = string.Empty;
+        //}
         storypart.Speech = item.Speech;
     }
 
@@ -189,8 +199,8 @@
         if (clearOnSubmit)
         {
             storypart = new StoryPart();
-            mp3BaseUri = string.Empty;
-            mp3FileName = string.Empty;
+            //mp3BaseUri = string.Empty;
+            //mp3FileName = string.Empty;
         }
         else
         {

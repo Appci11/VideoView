@@ -20,16 +20,19 @@
                     <InputNumber @bind-Value="item.Time" class="form-control" style="max-width:300px"></InputNumber>
                     <button @onclick="() => RemovePeriod(item)" class="btn btn-danger">Remove</button>
                 </div>
-                <label>
-                    Is Done
-                    <InputSelect @bind-Value="item.Done" class="form-select" style="min-width:300px;">
-                        <option value="true">Yes</option>
-                        <option default value="false">No</option>
-                    </InputSelect>
-                </label>
                 <div>
                     <label for="exec">Exec</label>
-                    <InputText id="exec" @bind-Value="item.Exec" class="form-control" style="max-width:300px;"></InputText>
+                    <InputSelect id="exec" @bind-Value="item.Exec" class="form-select" style="max-width:300px;">
+                        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
+                        {
+                            <option value="@item.Title">@item.Title</option>
+                        }
+                        @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
+                        {
+                            <option value="@item.Title">@item.Title</option>
+                        }
+
+                    </InputSelect>
                 </div>
             }
             <br />
@@ -44,17 +47,33 @@
     </div>
     <!-- RIGHT SIDE -->
     <div>
+        @*
         <div>
-            <!-- According to google docs <iframe> video throwing lots of errors is intended behaviour... so it does just that -->
-            <label for="vidurl">YouTube video url</label>
-            <InputText id="vidurl" @bind-Value="storyobserverpart.VideoUri" placeholder="example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control" style="max-width:500px;"></InputText>
-            <button class="btn btn-primary" @onclick="LoadVideo">Load Video</button>
+        <!-- According to google docs <iframe> video throwing lots of errors is intended behaviour... so it does just that -->
+        <label for="vidurl">YouTube video url</label>
+        <InputText id="vidurl" @bind-Value="storyobserverpart.VideoUri" placeholder="example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control" style="max-width:500px;"></InputText>
+        <button class="btn btn-primary" @onclick="LoadVideo">Load Video</button>
         </div>
+        *@
+        @if (vidLoaded)
+        {
+
+
+            <div class="d-flex flex-column p-2 align-content-center border border-info">
+                <BlazoredVideo TimeUpdateEvent="OnEvent"
+                           VideoEventOptions="options"
+                           class="w-100"
+                           style="max-width:800px;"
+                           controls="controls">
+                    <source src="video_example.mp4" type="video/mp4" />
+                </BlazoredVideo>
+            </div>
+        }
         <div>
             <div id="player"></div>
             <br />
             <button class="btn btn-primary" @onclick="GetCurrentVideoTime">Add Period With Current Video Time</button>
-            
+
         </div>
         <hr />
         @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryObserverParts)
@@ -77,24 +96,52 @@
     int storyobserverpartIndex = -1;
     bool editDisable = true;
 
+    Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+    VideoState videoState;
+    Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
     bool vidLoaded = false;
     string vidId = string.Empty;
 
+    protected override void OnInitialized()
+    {
+        foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
+        {
+            if (item != VideoEvents.NotSet)
+            {
+                eventCounter[item] = 0;
+            }
+        }
+        options[VideoEvents.TimeUpdate] = new VideoStateOptions { CurrentTime = true };
+        vidLoaded = true;
+    }
+
     void LoadVideo()
     {
-        string[] arr = storyobserverpart.VideoUri.Split("watch?v=");
-        vidId = arr[1];
-        Console.WriteLine("got into LoadVideo");
-        _jsRuntime.InvokeVoidAsync("initializePlayer", vidId);
+        //string[] arr = storyobserverpart.VideoUri.Split("watch?v=");
+        //vidId = arr[1];
+        //Console.WriteLine("got into LoadVideo");
+        //_jsRuntime.InvokeVoidAsync("initializePlayer", vidId);
+
         vidLoaded = true;
         StateHasChanged();
     }
 
     private async Task GetCurrentVideoTime()
     {
-        double sk = await _jsRuntime.InvokeAsync<double>("getTime");
-        int sk1 = (int)sk;
-        AddPeriod(sk1);
+        //double sk = await _jsRuntime.InvokeAsync<double>("getTime");
+        try
+        {
+            double sk = videoState.CurrentTime;
+            int sk1 = (int)sk;
+            AddPeriod(sk1);
+        }
+        catch { }
+    }
+
+    void OnEvent(VideoState state)
+    {
+        videoState = state;
+        eventCounter[VideoEvents.TimeUpdate]++;
     }
 
     void AddPeriod()

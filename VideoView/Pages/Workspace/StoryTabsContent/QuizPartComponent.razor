@@ -26,8 +26,10 @@
             <label>Correct Nr</label><br>
             <InputNumber @bind-Value="quizpart.CorrectNr" class="form-control" style="max-width:300px"></InputNumber>
         </div>
+@*
         <br />
         <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
+*@
         <hr />
         <h4>Quiz options to pick</h4>
         @foreach (var item in quizpart.Options)
@@ -63,6 +65,12 @@
                 <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
             </div>
             <label>
+                Speech
+                <InputText @bind-Value="item.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
+                @*<i>in .xml @item.Speech</i>*@
+            </label>
+@*
+            <label>
                 Speech (base uri + .mp3 audio file name)
                 <InputText @bind-Value="item.Mp3BaseUri" placeholder="Base uri (can be empty)" class="form-control" style="max-width:300px"></InputText>
                 <InputSelect @bind-Value="item.Mp3FileName" class="form-select" style="max-width:300px;">
@@ -82,6 +90,7 @@
                 </InputSelect>
                 <i>in .xml @item.Speech</i>
             </label>
+*@
         }
         <br />
         <br />
