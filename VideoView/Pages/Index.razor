@@ -27,7 +27,7 @@
         {
             <div>
                 <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
-                    <MudSelect @bind-Value="@CategoryName" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.TopLeft">
+                    <MudSelect @bind-Value="@CategoryName" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @if (Categories != null)
                         {
                             @foreach (Category item in Categories)
@@ -53,7 +53,7 @@
                     </MudSelect>
                 </MudContainer>
                 <MudIconButton OnClick="OpenAddProjectDialog" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="Add"></MudIconButton>
-                <MudIconButton Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
+                <MudIconButton OnClick="RemoveProject" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
             </div>
             <MudButton OnClick="GoToWorkspace"
                    Target="_blank"
@@ -63,11 +63,6 @@
                    Disabled=@goToWorkspaceDisabled>
                 Go To Project
             </MudButton>
-            <MudSelect T="string" Label="Coffee" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem @onclick="@(() => Console.WriteLine(44))" Value="@("Cappuccino")" />
-                <MudSelectItem Value="@("Cafe Latte")" />
-                <MudSelectItem Value="@("Espresso")" />
-            </MudSelect>
 
             @*            @if (categoriesExist)
         {
@@ -267,6 +262,19 @@ Welcome to your new app.
                 await _projectsService.AddProject(pro, CategoryId);
                 Projects = await _projectsService.GetAllProjects(CategoryId);
                 goToWorkspaceDisabled = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    async void RemoveProject()
+    {
+        if(CategoryId != null && ProjectId != null)
+        {
+            if (CategoryId.Length > 0 && ProjectId.Length > 0)
+            {
+                await _projectsService.DeleteCategory(CategoryId, ProjectId);
+                GetProjects();
                 StateHasChanged();
             }
         }

@@ -6,6 +6,7 @@
         public string Name { get; set; } = string.Empty;    // in xml called name, in reality - language
         public string? Speech { get; set; }
         public List<Talk> Talks { get; set; } = new List<Talk>();
+        public bool ShowDetails { get; set; }
     }
 
     public class Talk

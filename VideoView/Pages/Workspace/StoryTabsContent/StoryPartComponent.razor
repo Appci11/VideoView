@@ -1,6 +1,7 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
+@*
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
@@ -24,36 +25,37 @@
                 <InputText @bind-Value="storypart.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
             </label>
         </div>
+*@
 @*
         <div>
-            <label>
-                Speech (base uri + .mp3 audio file name)
-                <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
-                <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="max-width:300px;">
-                    @if (_workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Count > 0)
-                    {
-                        <option value="" disabled default hidden>Previous files found</option>
-                        @foreach (string name in _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames)
-                        {
-                            <option value="@name">@name</option>
-                        }
-                        <option value="">None</option>
-                    }
-                    else
-                    {
-                        <option value="" disabled default hidden>Choose files</option>
-                    }
-                </InputSelect>
-            </label>
-            <br />
-            <i>in .xml @storypart.Speech</i>
+        <label>
+        Speech (base uri + .mp3 audio file name)
+        <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
+        <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="max-width:300px;">
+        @if (_workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Count > 0)
+        {
+        <option value="" disabled default hidden>Previous files found</option>
+        @foreach (string name in _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames)
+        {
+        <option value="@name">@name</option>
+        }
+        <option value="">None</option>
+        }
+        else
+        {
+        <option value="" disabled default hidden>Choose files</option>
+        }
+        </InputSelect>
+        </label>
+        <br />
+        <i>in .xml @storypart.Speech</i>
         </div>
-*@
+        *@
 @*
         <br />
         <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
-*@
-        <hr />
+        *@
+@*        <hr />
         <h4>Talking Points</h4>
         @foreach (var item in storypart.Talks)
         {
@@ -86,13 +88,99 @@
         }
     </div>
 </div>
+*@
+
+<MudTable Items="_workspaceService.WorkClass.StoryScript.StoryParts">
+    <ColGroup>
+        <col style="width:220px;" />
+        <col style="width:150px;" />
+        <col style="width:180px;" />
+        @*<col style="width:300px;" />*@
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudButton OnClick="AddNewStoryPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">Add New Part</MudButton></MudTh>
+        <MudTh>Title</MudTh>
+        <MudTh>Language</MudTh>
+        <MudTh>Speech</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudButton OnClick="@(() => RemoveStoryPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">Remove</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">T Points</MudButton>
+        </MudTd>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="Language">@context.Name</MudTd>
+        <MudTd DataLabel="Speech">@context.Speech</MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Title">
+            <MudTextField @bind-Value="@context.Title" Required />
+        </MudTd>
+        <MudTd DataLabel="Language">
+            @*<MudTextField @bind-Value="@context.Name" Required />*@
+            <MudSelect @bind-Value="@context.Name" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("en")">English</MudSelectItem>
+                <MudSelectItem Value="@("lt")">Lithuanian</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Speech">
+            <MudTextField @bind-Value="@context.Speech" Required />
+        </MudTd>
+    </RowEditingTemplate>
+    <ChildRowContent>
+        @if (context.ShowDetails)
+        {
+            <MudTr>
+                <td colspan="4">
+                    <MudCard Elevation="0">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Talking points for <strong>@context.Title</strong></MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent Class="pa-0">
+                            <MudTable Items="@context.Talks" Context="TalksContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                <ColGroup>
+                                    <col style="width:80px;" />
+                                    <col style="width:100px;" />
+                                </ColGroup>
+                                <HeaderContent>
+                                    <MudTh><MudButton OnClick="@(()=> AddNewTalk(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">New</MudButton></MudTh>
+                                    <MudTh>Wait Time</MudTh>
+                                    <MudTh>Name</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>
+                                        <MudButton OnClick="@(() => RemoveTalk(context, TalksContext))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">Remove</MudButton>
+                                    </MudTd>
+                                    <MudTd DataLabel="Wait Time">@TalksContext.Wait</MudTd>
+                                    <MudTd DataLabel="Text">@TalksContext.Text</MudTd>
+                                </RowTemplate>
+                                <RowEditingTemplate>
+                                    <MudTd></MudTd>
+                                    <MudTd DataLabel="Wait Time">
+                                        <MudNumericField @bind-Value="@TalksContext.Wait" Required />
+                                    </MudTd>
+                                    <MudTd DataLabel="Text">
+                                        <MudTextField @bind-Value="@TalksContext.Text" Required />
+                                    </MudTd>
+                                </RowEditingTemplate>
+                            </MudTable>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+</MudTable>
 
 @code {
     [Parameter]
     public EventCallback Notify { get; set; }
 
     StoryPart storypart = new StoryPart();
-    //List<Talk> Talks = new List<Talk> { new Talk() };    
+    //List<Talk> Talks = new List<Talk> { new Talk() };
 
     int sk = -1;
     //string mp3BaseUri = string.Empty;
@@ -228,5 +316,39 @@
             }
             catch { }
         }
+    }
+
+    private void ShowBtnPress(StoryPart sp)
+    {
+        sp.ShowDetails = !sp.ShowDetails;
+    }
+
+    async void AddNewStoryPart()
+    {
+        StoryPart part = new StoryPart { Title = "temp title" };
+        Talk talk = new Talk { Text = "temp text" };
+        part.Talks.Add(talk);
+        _workspaceService.WorkClass.StoryScript.StoryParts.Add(part);
+        await Notify.InvokeAsync();
+    }
+
+    async void RemoveStoryPart(StoryPart sp)
+    {
+        _workspaceService.WorkClass.StoryScript.StoryParts.Remove(sp);
+        await Notify.InvokeAsync();
+    }
+
+    void AddNewTalk(StoryPart sp)
+    {
+        sp.Talks.Add(new Talk { Text = "temp text" });
+    }
+
+    void RemoveTalk(StoryPart sp, Talk t)
+    {
+        try
+        {
+            _workspaceService.WorkClass.StoryScript.StoryParts.FirstOrDefault(sp).Talks.Remove(t);
+        }
+        catch { }
     }
 }
