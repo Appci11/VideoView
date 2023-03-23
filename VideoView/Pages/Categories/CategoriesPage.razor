@@ -9,7 +9,12 @@
 
 
 <h3>Kategorijos</h3>
-@if (loaded)
+
+
+
+
+
+@*@if (loaded)
 {
     <div>
         <QuickGrid Items="FilteredCategories" ResizableColumns Class="search">
@@ -33,7 +38,7 @@
 else
 {
     <div class="loader">Loading...</div>
-}
+}*@
 
 @code {
     bool loaded = false;

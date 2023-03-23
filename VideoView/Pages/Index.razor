@@ -5,6 +5,7 @@
 @using VideoView.Services.CategoriesService;
 @using VideoView.Services.ProjectsService;
 @using VideoView.Services.WorkspaceService;
+@using VideoView.Shared.Dialogs;
 
 @inject AuthenticationStateProvider _authStateProvider
 @inject NavigationManager _navigationManager
@@ -13,6 +14,7 @@
 @inject IWorkspaceService _workspaceService
 @inject IAuthService _authService
 @inject ILocalStorageService _localStorage
+@inject IDialogService _dialogService
 
 <AuthorizeView>
     <NotAuthorized>
@@ -21,36 +23,80 @@
         </div>
     </NotAuthorized>
     <Authorized>
-        @if(loaded)
+        @if (loaded)
         {
-            @if (categoriesExist)
-            {
-                <label for="category">Rastos kategorijos</label>
-                <select id="category" class="form-select" @onchange="GetProjects">
-                    <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
-                    @foreach (Category category in Categories!)
-                    {
-                        <option value="@category.name">@category.fields.name.stringValue</option>
-                    }
-                </select>
-                <br />
-                <label for="project">Rasti projektai</label>
-                <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
-                    <option value="" selected disabled hidden>Pasirinkti projektą</option>
-                    @if (Projects != null)
-                    {
-                        @foreach (Project project in Projects!)
+            <div>
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
+                    <MudSelect @bind-Value="@CategoryName" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.TopLeft">
+                        @if (Categories != null)
                         {
-                            <option value="@project.name">@project.fields.name.stringValue</option>
+                            @foreach (Category item in Categories)
+                            {
+                                <MudSelectItem Value="item.name">@item.fields.name.stringValue</MudSelectItem>
+                            }
                         }
-                    }
-                </select>
-                <br />
-                <div>
-                    @errorText
-                </div>
-                <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
-            }
+                    </MudSelect>
+                </MudContainer>
+                <MudIconButton OnClick="OpenAddCategoryDialog" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="Add"></MudIconButton>
+                <MudIconButton Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
+            </div>
+            <div style="padding-bottom=20px">
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
+                    <MudSelect @bind-Value="ProjectName" Margin="Margin.Dense" Disabled="@projectsSelectionDisabled" Dense="true" FullWidth="false" T="string" Label="Project" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @if (Projects != null)
+                        {
+                            @foreach (Project item in Projects)
+                            {
+                                <MudSelectItem Value="item.name">@item.fields.name.stringValue</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                </MudContainer>
+                <MudIconButton OnClick="OpenAddProjectDialog" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="Add"></MudIconButton>
+                <MudIconButton Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
+            </div>
+            <MudButton OnClick="GoToWorkspace"
+                   Target="_blank"
+                   Variant="Variant.Filled"
+                   EndIcon="@Icons.Material.Filled.ArrowForward"
+                   Color="Color.Primary"
+                   Disabled=@goToWorkspaceDisabled>
+                Go To Project
+            </MudButton>
+            <MudSelect T="string" Label="Coffee" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem @onclick="@(() => Console.WriteLine(44))" Value="@("Cappuccino")" />
+                <MudSelectItem Value="@("Cafe Latte")" />
+                <MudSelectItem Value="@("Espresso")" />
+            </MudSelect>
+
+            @*            @if (categoriesExist)
+        {
+        <label for="category">Rastos kategorijos</label>
+        <select id="category" class="form-select" @onchange="GetProjects">
+        <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
+        @foreach (Category category in Categories!)
+        {
+        <option value="@category.name">@category.fields.name.stringValue</option>
+        }
+        </select>
+        <br />
+        <label for="project">Rasti projektai</label>
+        <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
+        <option value="" selected disabled hidden>Pasirinkti projektą</option>
+        @if (Projects != null)
+        {
+        @foreach (Project project in Projects!)
+        {
+        <option value="@project.name">@project.fields.name.stringValue</option>
+        }
+        }
+        </select>
+        <br />
+        <div>
+        @errorText
+        </div>
+        <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
+        }*@
         }
         else
         {
@@ -75,6 +121,32 @@ Welcome to your new app.
     string CategoryId { get; set; } = string.Empty;
     List<Project>? Projects;
     string ProjectId { get; set; } = string.Empty;
+    string categoryName = string.Empty;
+    string CategoryName
+    {
+        get
+        {
+            return categoryName;
+        }
+        set
+        {
+            categoryName = value;
+            GetProjects();
+        }
+    }
+    string projectName = string.Empty;
+    string ProjectName
+    {
+        get
+        {
+            return projectName;
+        }
+        set
+        {
+            projectName = value;
+            SelectProject(projectName);
+        }
+    }
 
     bool loaded = false;
     bool categoriesExist = false;
@@ -83,9 +155,14 @@ Welcome to your new app.
 
     string errorText = "";
 
+    void Kriu()
+    {
+        Console.WriteLine("kriu");
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        if(await _localStorage.GetItemAsync<DateTime>("idTokenExpirationDate") < DateTime.Now)
+        if (await _localStorage.GetItemAsync<DateTime>("idTokenExpirationDate") < DateTime.Now)
         {
             await _authService.RefreshTokens();
         }
@@ -108,28 +185,44 @@ Welcome to your new app.
         loaded = true;
     }
 
-    async void GetProjects(ChangeEventArgs e)
+    async void GetProjects()
     {
-        CategoryId = e.Value.ToString().Split('/').Last();
+        CategoryId = categoryName.Split('/').Last();
         Projects = await _projectsService.GetAllProjects(CategoryId);
-        if (Projects != null && Projects.Count > 0)
-        {
-            projectsSelectionDisabled = false;
-            StateHasChanged();
-        }
-        else
-        {
-            errorText = "Pasirinkta kategorija neturi nei vieno projekto.";
-            StateHasChanged();
-        }
+        projectsSelectionDisabled = false;
+        StateHasChanged();
+
     }
 
-    void SelectProject(ChangeEventArgs e)
+    //async void GetProjects(ChangeEventArgs e)
+    //{
+    //    CategoryId = e.Value.ToString().Split('/').Last();
+    //    Projects = await _projectsService.GetAllProjects(CategoryId);
+    //    if (Projects != null && Projects.Count > 0)
+    //    {
+    //        projectsSelectionDisabled = false;
+    //        StateHasChanged();
+    //    }
+    //    else
+    //    {
+    //        errorText = "Pasirinkta kategorija neturi nei vieno projekto.";
+    //        StateHasChanged();
+    //    }
+    //}
+
+    void SelectProject(string e)
     {
-        ProjectId = e.Value.ToString().Split('/').Last();
+        ProjectId = e.Split('/').Last();
         goToWorkspaceDisabled = false;
         StateHasChanged();
     }
+
+    //void SelectProject(ChangeEventArgs e)
+    //{
+    //    ProjectId = e.Value.ToString().Split('/').Last();
+    //    goToWorkspaceDisabled = false;
+    //    StateHasChanged();
+    //}
 
     void GoToLogin()
     {
@@ -141,5 +234,41 @@ Welcome to your new app.
         _workspaceService.CategoryId = CategoryId;
         _workspaceService.ProjectId = ProjectId;
         _navigationManager.NavigateTo($"/workspace/{CategoryId}/{ProjectId}");
+    }
+
+    async void OpenAddCategoryDialog()
+    {
+        var dialog = await _dialogService.ShowAsync<EnterOneStringDialog>();
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data != null)
+        {
+            string eil = result.Data.ToString()!;
+            if (eil.Length > 0)
+            {
+                Category cat = new Category();
+                cat.fields.name.stringValue = eil;
+                await _categoriesService.AddCategory(cat);
+                Categories = await _categoriesService.GetAllCategories();
+            }
+        }
+    }
+
+    async void OpenAddProjectDialog()
+    {
+        var dialog = await _dialogService.ShowAsync<EnterOneStringDialog>();
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data != null)
+        {
+            string eil = result.Data.ToString()!;
+            if (eil.Length > 0)
+            {
+                Project pro = new Project();
+                pro.fields.name.stringValue = eil;
+                await _projectsService.AddProject(pro, CategoryId);
+                Projects = await _projectsService.GetAllProjects(CategoryId);
+                goToWorkspaceDisabled = false;
+                StateHasChanged();
+            }
+        }
     }
 }

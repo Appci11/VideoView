@@ -7,37 +7,11 @@
 
 <h3>Cats</h3>
 
-@if (loaded)
-{
-    <div>
-        <QuickGrid Items="FilteredCats" ResizableColumns Pagination="pagination" Class="search">
-            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Name">
-                <ColumnOptions>
-                    <div class="search-box">
-                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Cat name..." />
-                    </div>
-                </ColumnOptions>
-            </PropertyColumn>
-            <PropertyColumn Property="c => c.createTime" Sortable="true" Title="Entry Creation Date" />
 
-            <TemplateColumn Title="Actions">
-                <button @onclick="@(() => GoToEdit(context))" class="btn btn-primary oi oi-pencil"></button>
-                <button @onclick="@(() => Delete_Click(context))" class="btn btn-danger oi oi-x"></button>
-            </TemplateColumn>
-
-
-        </QuickGrid>
-    </div>
-    <button class="btn btn-primary" @onclick="CreateNewCat">Create a new cat</button>
-}
-else
-{
-    <div class="loader">Loading...</div>
-}
 
 @code {
     IQueryable<Cat>? itemsQueryable;
-    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    //PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
     string nameFilter;
 
@@ -84,5 +58,35 @@ else
         itemsQueryable = _catsService.Cats.AsQueryable();
         StateHasChanged();
     }
+
+
+
+//    @if (loaded)
+//{
+//    <div>
+//        <QuickGrid Items="FilteredCats" ResizableColumns Pagination="pagination" Class="search">
+//            <PropertyColumn Property="c => c.fields.name.stringValue" Sortable="true" Title="Name">
+//                <ColumnOptions>
+//                    <div class="search-box">
+//                        <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Cat name..." />
+//                    </div>
+//                </ColumnOptions>
+//            </PropertyColumn>
+//            <PropertyColumn Property="c => c.createTime" Sortable="true" Title="Entry Creation Date" />
+
+//            <TemplateColumn Title="Actions">
+//                <button @onclick="@(() => GoToEdit(context))" class="btn btn-primary oi oi-pencil"></button>
+//                <button @onclick="@(() => Delete_Click(context))" class="btn btn-danger oi oi-x"></button>
+//            </TemplateColumn>
+
+
+//        </QuickGrid>
+//    </div>
+//    <button class="btn btn-primary" @onclick="CreateNewCat">Create a new cat</button>
+//}
+//else
+//{
+//    <div class="loader">Loading...</div>
+//}
 
 }

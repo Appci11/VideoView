@@ -9,6 +9,7 @@ using VideoView.Services.CatsService;
 using VideoView.Services.ProjectsService;
 using VideoView.Services.UsersService;
 using VideoView.Services.WorkspaceService;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,6 +19,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
+
+builder.Services.AddMudServices();
 
 builder.Services.AddScoped<ICatsService, CatsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

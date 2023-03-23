@@ -8,7 +8,9 @@
 
 <h3>Projects</h3>
 
-@if (loaded)
+
+
+@*@if (loaded)
 {
     <div>
         <QuickGrid Items="FilteredProjects" ResizableColumns Class="search">
@@ -32,7 +34,7 @@
 else
 {
     <dic class="loader">Loading...</dic>
-}
+}*@
 @code {
     [Parameter]
     public string categoryId { get; set; }

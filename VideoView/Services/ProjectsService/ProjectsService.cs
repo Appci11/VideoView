@@ -30,7 +30,7 @@ namespace VideoView.Services.ProjectsService
             {
                 return docs.documents;
             }
-            return null;
+            return new List<Project>();
         }
 
         public async Task<Project> GetProjectById(string categoryId, string id)
