@@ -90,22 +90,21 @@
 </div>
 *@
 
-<MudTable Items="_workspaceService.WorkClass.StoryScript.StoryParts">
+<MudTable Items="_workspaceService.WorkClass.StoryScript.StoryParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
-        <col style="width:220px;" />
+        <col style="width:200px;" />
         <col style="width:150px;" />
         <col style="width:180px;" />
-        @*<col style="width:300px;" />*@
     </ColGroup>
     <HeaderContent>
-        <MudTh><MudButton OnClick="AddNewStoryPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">Add New Part</MudButton></MudTh>
+        <MudTh><MudButton OnClick="AddNewStoryPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">ADD</MudButton></MudTh>
         <MudTh>Title</MudTh>
         <MudTh>Language</MudTh>
         <MudTh>Speech</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudButton OnClick="@(() => RemoveStoryPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">Remove</MudButton>
+            <MudButton OnClick="@(() => RemoveStoryPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
             <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">T Points</MudButton>
         </MudTd>
         <MudTd DataLabel="Title">@context.Title</MudTd>
@@ -118,7 +117,6 @@
             <MudTextField @bind-Value="@context.Title" Required />
         </MudTd>
         <MudTd DataLabel="Language">
-            @*<MudTextField @bind-Value="@context.Name" Required />*@
             <MudSelect @bind-Value="@context.Name" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 <MudSelectItem Value="@("en")">English</MudSelectItem>
                 <MudSelectItem Value="@("lt")">Lithuanian</MudSelectItem>
@@ -134,26 +132,19 @@
             <MudTr>
                 <td colspan="4">
                     <MudCard Elevation="0">
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.body1">Talking points for <strong>@context.Title</strong></MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
                         <MudCardContent Class="pa-0">
                             <MudTable Items="@context.Talks" Context="TalksContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
                                 <ColGroup>
-                                    <col style="width:80px;" />
-                                    <col style="width:100px;" />
+                                    <col style="width:20px;" />
+                                    <col style="width:120px;" />
                                 </ColGroup>
                                 <HeaderContent>
-                                    <MudTh><MudButton OnClick="@(()=> AddNewTalk(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">New</MudButton></MudTh>
+                                    <MudTh><MudIconButton OnClick="@(() => AddNewTalk(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
                                     <MudTh>Wait Time</MudTh>
                                     <MudTh>Name</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd>
-                                        <MudButton OnClick="@(() => RemoveTalk(context, TalksContext))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">Remove</MudButton>
-                                    </MudTd>
+                                    <MudTd><MudIconButton OnClick="@(() => RemoveTalk(context, TalksContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
                                     <MudTd DataLabel="Wait Time">@TalksContext.Wait</MudTd>
                                     <MudTd DataLabel="Text">@TalksContext.Text</MudTd>
                                 </RowTemplate>

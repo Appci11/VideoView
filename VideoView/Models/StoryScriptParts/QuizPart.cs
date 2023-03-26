@@ -8,6 +8,7 @@
         public int CorrectNr { get; set; }
         // Speech berods galima praleist, tai praleista, nors 1-oj vietoj in .xml ir egzistuoja
         public List<Option> Options { get; set; } = new List<Option>();
+        public bool ShowDetails { get; set; }
     }
 
     public class Option

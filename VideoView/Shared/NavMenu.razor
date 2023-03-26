@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">VideoView</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -54,6 +58,22 @@
                 </NavLink>
             </div>
         </AuthorizeView>
+                <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3 login">
+                    <NavLink class="nav-link" @onclick="Logout">
+                        <span class="oi oi-account-logout" aria-hidden="true"></span>Logout
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3 login">
+                    <NavLink class="nav-link" href="login">
+                        <span class="oi oi-account-login" aria-hidden="true"></span>Login/Register
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </div>
 
@@ -65,5 +85,16 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    async Task Logout()
+    {
+        await _localStorage.RemoveItemAsync("idToken");
+        await _localStorage.RemoveItemAsync("idTokenExpirationDate");
+        await _localStorage.RemoveItemAsync("refreshToken");
+        await _localStorage.RemoveItemAsync("userId");
+        await _localStorage.RemoveItemAsync("keepLoggedIn");
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("/");
     }
 }

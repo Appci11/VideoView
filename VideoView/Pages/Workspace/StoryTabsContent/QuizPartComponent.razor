@@ -1,6 +1,7 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
+@*
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
@@ -26,11 +27,12 @@
             <label>Correct Nr</label><br>
             <InputNumber @bind-Value="quizpart.CorrectNr" class="form-control" style="max-width:300px"></InputNumber>
         </div>
+*@
 @*
         <br />
         <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
 *@
-        <hr />
+@*        <hr />
         <h4>Quiz options to pick</h4>
         @foreach (var item in quizpart.Options)
         {
@@ -67,8 +69,11 @@
             <label>
                 Speech
                 <InputText @bind-Value="item.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
-                @*<i>in .xml @item.Speech</i>*@
+               *@
+@*<i>in .xml @item.Speech</i>*@
+@*
             </label>
+*@
 @*
             <label>
                 Speech (base uri + .mp3 audio file name)
@@ -91,6 +96,7 @@
                 <i>in .xml @item.Speech</i>
             </label>
 *@
+@*
         }
         <br />
         <br />
@@ -112,6 +118,113 @@
         }
     </div>
 </div>
+*@
+
+<MudTable Items="_workspaceService.WorkClass.StoryScript.QuizParts" Dense="true" RowStyle="background-color:#F6F6F6">
+    <ColGroup>
+        <col style="width:200px;" />
+        <col style="width:150px;" />
+        <col style="width:180px;" />
+        <col style="width:150px;" />
+        <col style="width:150px;" />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudButton OnClick="AddNewQuizPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">ADD</MudButton></MudTh>
+        <MudTh>Title</MudTh>
+        <MudTh>Language</MudTh>
+        <MudTh>Nr</MudTh>
+        <MudTh>Correct Nr</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudButton OnClick="@(() => RemoveQuizPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Options</MudButton>
+        </MudTd>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="Language">@context.Name</MudTd>
+        <MudTd DataLabel="Nr">@context.Nr</MudTd>
+        <MudTd DataLabel="Correct Nr">@context.CorrectNr</MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Title">
+            <MudTextField @bind-Value="@context.Title" Required />
+        </MudTd>
+        <MudTd DataLabel="Language">
+            <MudSelect @bind-Value="@context.Name" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("en")">English</MudSelectItem>
+                <MudSelectItem Value="@("lt")">Lithuanian</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Nr">
+            <MudNumericField @bind-Value="@context.Nr" Required />
+        </MudTd>
+        <MudTd DataLabel="Correct Nr">
+            <MudNumericField @bind-Value="@context.CorrectNr" Required />
+        </MudTd>
+    </RowEditingTemplate>
+    <ChildRowContent>
+        @if (context.ShowDetails)
+        {
+            <td colspan="7">
+                <MudCard Elevation="0">
+
+                    <MudTable Items="@context.Options" Context="QuizContext" Hover="true">
+                        <ColGroup>
+                            <col style="width:20px;" />
+                            <col style="width:100px;" />
+                            <col style="width:100px;" />
+                            <col style="width:100px;" />
+                            <col style="width:100px;" />
+                            <col style="width:400px;" />
+                        </ColGroup>
+                        <HeaderContent>
+                            <MudTh><MudIconButton OnClick="@(() => AddNewOption(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
+                            <MudTh>OX</MudTh>
+                            <MudTh>OY</MudTh>
+                            <MudTh>Wait</MudTh>
+                            <MudTh>Is True</MudTh>
+                            <MudTh>Text</MudTh>
+                            <MudTh>Answer</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd><MudIconButton OnClick="@(() => RemoveOption(context, QuizContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
+                            <MudTd DataLabel="OX">@QuizContext.OX</MudTd>
+                            <MudTd DataLabel="OY">@QuizContext.OX</MudTd>
+                            <MudTd DataLabel="Wait">@QuizContext.Wait</MudTd>
+                            <MudTd DataLabel="Is True">@QuizContext.IsTrue</MudTd>
+                            <MudTd DataLabel="Text">@QuizContext.Text</MudTd>
+                            <MudTd DataLabel="Answer">@QuizContext.Answer</MudTd>
+                        </RowTemplate>
+                        <RowEditingTemplate>
+                            <MudTd></MudTd>
+                            <MudTd DataLabel="OX">
+                                <MudNumericField @bind-Value="QuizContext.OX" Required />
+                            </MudTd>
+                            <MudTd DataLabel="OY">
+                                <MudNumericField @bind-Value="QuizContext.OY" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Wait">
+                                <MudNumericField @bind-Value="QuizContext.Wait" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Is True">
+                                <MudCheckBox @bind-Checked="QuizContext.IsTrue"></MudCheckBox>
+                            </MudTd>
+                            <MudTd DataLabel="Text">
+                                <MudTextField @bind-Value="@QuizContext.Text" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Answer">
+                                <MudTextField @bind-Value="@QuizContext.Answer" Required />
+                            </MudTd>
+                        </RowEditingTemplate>
+                    </MudTable>
+                </MudCard>
+            </td>
+        }
+    </ChildRowContent>
+</MudTable>
+
+
 
 @code {
     [Parameter]
@@ -245,5 +358,39 @@
             }
             catch { }
         }
+    }
+
+    private void ShowBtnPress(QuizPart qp)
+    {
+        qp.ShowDetails = !qp.ShowDetails;
+    }
+
+    async void AddNewQuizPart()
+    {
+        QuizPart part = new QuizPart { Title = "temp title" };
+        Option option = new Option { Text = "temp text" };
+        part.Options.Add(option);
+        _workspaceService.WorkClass.StoryScript.QuizParts.Add(part);
+        await Notify.InvokeAsync();
+    }
+
+    async void RemoveQuizPart(QuizPart qp)
+    {
+        _workspaceService.WorkClass.StoryScript.QuizParts.Remove(qp);
+        await Notify.InvokeAsync();
+    }
+
+    void AddNewOption(QuizPart qp)
+    {
+        qp.Options.Add(new Option { Text = "temp text" });
+    }
+
+    void RemoveOption(QuizPart qp, Option o)
+    {
+        try
+        {
+            _workspaceService.WorkClass.StoryScript.QuizParts.FirstOrDefault(qp).Options.Remove(o);
+        }
+        catch { }
     }
 }

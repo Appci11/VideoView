@@ -5,45 +5,119 @@
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
+        @*
         <h2>Story Observer Part (@storyobserverpart.Title)</h2>
         <div>
-            <div>
-                <label for="title">Title (node tag value in .xml)</label>
-                <InputText id="title" @bind-Value="storyobserverpart.Title" class="form-control" style="max-width:300px;"></InputText>
-            </div>
-            <hr />
-            <h4>Periods</h4>
-            @foreach (var item in storyobserverpart.Periods)
-            {
-                <div>
-                    <label>Time</label><br>
-                    <InputNumber @bind-Value="item.Time" class="form-control" style="max-width:300px"></InputNumber>
-                    <button @onclick="() => RemovePeriod(item)" class="btn btn-danger">Remove</button>
-                </div>
-                <div>
-                    <label for="exec">Exec</label>
-                    <InputSelect id="exec" @bind-Value="item.Exec" class="form-select" style="max-width:300px;">
-                        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
-                        {
-                            <option value="@item.Title">@item.Title</option>
-                        }
-                        @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
-                        {
-                            <option value="@item.Title">@item.Title</option>
-                        }
-
-                    </InputSelect>
-                </div>
-            }
-            <br />
-            <button @onclick="AddPeriod" class="btn btn-primary">Add More Periods</button>
-            <br />
-            <br />
-            <button @onclick="HandleSubmit" class="btn btn-primary">Add New Story Observer Using Current Data</button>
-            <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
-            <br />
-            <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Menu Part</button>
+        <div>
+        <label for="title">Title (node tag value in .xml)</label>
+        <InputText id="title" @bind-Value="storyobserverpart.Title" class="form-control" style="max-width:300px;"></InputText>
         </div>
+        <hr />
+        <h4>Periods</h4>
+        @foreach (var item in storyobserverpart.Periods)
+        {
+        <div>
+        <label>Time</label><br>
+        <InputNumber @bind-Value="item.Time" class="form-control" style="max-width:300px"></InputNumber>
+        <button @onclick="() => RemovePeriod(item)" class="btn btn-danger">Remove</button>
+        </div>
+        <div>
+        <label for="exec">Exec</label>
+        <InputSelect id="exec" @bind-Value="item.Exec" class="form-select" style="max-width:300px;">
+        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
+        {
+        <option value="@item.Title">@item.Title</option>
+        }
+        @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
+        {
+        <option value="@item.Title">@item.Title</option>
+        }
+
+        </InputSelect>
+        </div>
+        }
+        <br />
+        <button @onclick="AddPeriod" class="btn btn-primary">Add More Periods</button>
+        <br />
+        <br />
+        <button @onclick="HandleSubmit" class="btn btn-primary">Add New Story Observer Using Current Data</button>
+        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
+        <br />
+        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Menu Part</button>
+        </div>
+        *@
+
+        <MudTable Items="_workspaceService.WorkClass.StoryScript.StoryObserverParts" Dense="true" RowStyle="background-color:#F6F6F6">
+            <ColGroup>
+                <col style="width:200px;" />
+                <col style="width:200px;" />
+            </ColGroup>
+            <HeaderContent>
+                <MudTh><MudButton OnClick="AddNewStoryObserverPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">ADD</MudButton></MudTh>
+                <MudTh>Title</MudTh>
+                <MudTh>Video Uri</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudButton OnClick="@(() => RemoveStoryObserverPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
+                    <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Periods</MudButton>
+                </MudTd>
+                <MudTd DataLabel="Title">@context.Title</MudTd>
+                <MudTd DataLabel="Video Uri">@context.VideoUri</MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd></MudTd>
+                <MudTd DataLabel="Title">
+                    <MudTextField @bind-Value="@context.Title" Required />
+                </MudTd>
+                <MudTd DataLabel="Video Uri">
+                    <MudTextField @bind-Value="@context.VideoUri" Required />
+                </MudTd>
+            </RowEditingTemplate>
+            <ChildRowContent>
+                @if (context.ShowDetails)
+                {
+                    <td colspan="3">
+                        <MudCard Elevation="0">
+                            <MudTable Items="@context.Periods" Context="StoryObserverContext" Hover="true">
+                                <ColGroup>
+                                    <col style="width:20px;" />
+                                    <col style="width:160px;" />
+                                </ColGroup>
+                                <HeaderContent>
+                                    <MudTh><MudIconButton OnClick="@(() => AddNewPeriod(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
+                                    <MudTh>Time</MudTh>
+                                    <MudTh>Exec</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd><MudIconButton OnClick="@(() => RemovePeriod(context, StoryObserverContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
+                                    <MudTd DataLabel="Time">@StoryObserverContext.Time</MudTd>
+                                    <MudTd DataLabel="Exec">@StoryObserverContext.Exec</MudTd>
+                                </RowTemplate>
+                                <RowEditingTemplate>
+                                    <MudTd></MudTd>
+                                    <MudTd DataLabel="Time">
+                                        <MudNumericField @bind-Value="StoryObserverContext.Time" Required />
+                                    </MudTd>
+                                    <MudTd DataLabel="Exec">
+                                        <MudSelect @bind-Value="StoryObserverContext.Exec" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Exec" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                            @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
+                                            {
+                                                <MudSelectItem Value="item.Title">@item.Title</MudSelectItem>
+                                            }
+                                            @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
+                                            {
+                                                <MudSelectItem Value="item.Title">@item.Title</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudTd>
+                                </RowEditingTemplate>
+                            </MudTable>
+                        </MudCard>
+                    </td>
+                }
+            </ChildRowContent>
+        </MudTable>
     </div>
     <!-- RIGHT SIDE -->
     <div>
@@ -62,9 +136,9 @@
             <div class="d-flex flex-column p-2 align-content-center border border-info">
                 <BlazoredVideo TimeUpdateEvent="OnEvent"
                            VideoEventOptions="options"
-                           class="w-100"
-                           style="max-width:800px;"
-                           controls="controls">
+                               class="w-100"
+                               style="max-width:800px;"
+                               controls="controls">
                     <source src="video_example.mp4" type="video/mp4" />
                 </BlazoredVideo>
             </div>
@@ -72,16 +146,25 @@
         <div>
             <div id="player"></div>
             <br />
-            <button class="btn btn-primary" @onclick="GetCurrentVideoTime">Add Period With Current Video Time</button>
 
+            @*<button class="btn btn-primary" @onclick="GetCurrentVideoTime">Add Period With Current Video Time</button>*@
+            <MudButton OnClick="AddNewPeriodFromVideo"
+                       Target="_blank"
+                       Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Primary">
+                Add Period
+            </MudButton>
         </div>
         <hr />
+        @*
         @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryObserverParts)
         {
-            <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
-            <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
-            <br />
+        <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
+        <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
+        <br />
         }
+        *@
     </div>
 </div>
 
@@ -209,5 +292,52 @@
     {
         _workspaceService.UpdateStoryScriptStoryObserverPart(storyobserverpart, storyobserverpartIndex);
         editDisable = true;
+    }
+
+    private void ShowBtnPress(StoryObserverPart sop)
+    {
+        sop.ShowDetails = !sop.ShowDetails;
+    }
+
+    async void AddNewStoryObserverPart()
+    {
+        StoryObserverPart part = new StoryObserverPart { Title = "temp title" };
+        Period period = new Period();
+        part.Periods.Add(period);
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts.Add(part);
+        await Notify.InvokeAsync();
+    }
+
+    async void RemoveStoryObserverPart(StoryObserverPart sop)
+    {
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts.Remove(sop);
+        await Notify.InvokeAsync();
+    }
+
+    void AddNewPeriod(StoryObserverPart sop)
+    {
+        sop.Periods.Add(new Period());
+    }
+
+    private void AddNewPeriodFromVideo()
+    {
+        double sk;
+        int sk1;
+        if (null != videoState)
+        {
+            sk = videoState.CurrentTime;
+            sk1 = (int)sk;
+        }
+        else sk1 = 0;
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Add(new Period { Time = sk1 });
+    }
+
+    void RemovePeriod(StoryObserverPart sop, Period p)
+    {
+        try
+        {
+            _workspaceService.WorkClass.StoryScript.StoryObserverParts.FirstOrDefault(sop).Periods.Remove(p);
+        }
+        catch { }
     }
 }

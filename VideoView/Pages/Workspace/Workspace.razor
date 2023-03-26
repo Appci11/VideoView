@@ -10,20 +10,21 @@
 
 @if (loaded)
 {
-    <h3>@_workspaceService.CategoryName >> @_workspaceService.projectName </h3>
-
+    <h3>@_workspaceService.CategoryName >> @_workspaceService.projectName 
+    <button @onclick="SaveChanges" class="btn btn-primary">Save changes</button>
+    <button @onclick="DownloadFile" class="btn btn-primary">Download .xml</button>
+    </h3>
+@*
     <label for="name">Name</label>
     <InputText id="name" @bind-Value="_workspaceService.WorkClass.name"></InputText>
+*@
 }
 else
 {
     <i>gathering things from server...</i>
 }
 
-<button class="btn btn-primary" @onclick="SaveChanges">Išsaugoti pakeitimus serveryje</button>
-<a>_________</a>
-<button class="btn btn-primary" @onclick="DownloadFile">Parsisiųsti .xml</button>
-<br />
+
 <br />
 
 @if (loaded)

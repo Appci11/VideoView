@@ -1,6 +1,7 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
+@*
 <div class="grid-container">
     <!-- LEFT SIDE -->
     <div>
@@ -59,6 +60,86 @@
         }
     </div>
 </div>
+*@
+
+<MudTable Items="_workspaceService.WorkClass.StoryScript.StoryMenuParts" Dense="true" RowStyle="background-color:#F6F6F6">
+    <ColGroup>
+        <col style="width:200px;" />
+        <col style="width:150px;" />
+        <col style="width:180px;" />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudButton OnClick="AddNewStoryMenuPart" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">ADD</MudButton></MudTh>
+        <MudTh>Title</MudTh>
+        <MudTh>Language</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudButton OnClick="@(() => RemoveStoryMenuPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Options</MudButton>
+        </MudTd>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="Language">@context.Name</MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Title">
+            <MudTextField @bind-Value="@context.Title" Required />
+        </MudTd>
+        <MudTd DataLabel="Language">
+            <MudSelect @bind-Value="@context.Name" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("en")">English</MudSelectItem>
+                <MudSelectItem Value="@("lt")">Lithuanian</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+    <ChildRowContent>
+         @if(context.ShowDetails)
+        {
+            <td colspan="5">
+                <MudCard Elevation="0">
+                    <MudTable Items="@context.Menus" Context="MenuContext" Hover="true">
+                        <ColGroup>
+                            <col style="width:20px;" />
+                            <col style="width:100px;" />
+                            <col style="width:100px;" />
+                            <col style="width:300px;" />
+                        </ColGroup>
+                        <HeaderContent>
+                            <MudTh><MudIconButton OnClick="@(() => AddNewMenu(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
+                            <MudTh>OX</MudTh>
+                            <MudTh>OY</MudTh>                            
+                            <MudTh>Text</MudTh>
+                            <MudTh>Action</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd><MudIconButton OnClick="@(() => RemoveMenu(context, MenuContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
+                            <MudTd DataLabel="OX">@MenuContext.OX</MudTd>
+                            <MudTd DataLabel="OY">@MenuContext.OX</MudTd>
+                            <MudTd DataLabel="Text">@MenuContext.Text</MudTd>
+                            <MudTd DataLabel="Action">@MenuContext.Action</MudTd>
+                        </RowTemplate>
+                        <RowEditingTemplate>
+                            <MudTd></MudTd>
+                            <MudTd DataLabel="OX">
+                                <MudNumericField @bind-Value="MenuContext.OX" Required />
+                            </MudTd>
+                            <MudTd DataLabel="OY">
+                                <MudNumericField @bind-Value="MenuContext.OY" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Text">
+                                <MudTextField @bind-Value="@MenuContext.Text" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Action">
+                                <MudTextField @bind-Value="@MenuContext.Action" Required />
+                            </MudTd>
+                        </RowEditingTemplate>
+                    </MudTable>
+                </MudCard>
+            </td>
+        }
+    </ChildRowContent>
+</MudTable>
 
 @code {
     [Parameter]
@@ -139,5 +220,39 @@
     void EditCurrentlySelected()
     {
         _workspaceService.UpdateStoryScriptStoryMenuPart(storymenupart, storymenupartIndex);
+    }
+
+    private void ShowBtnPress(StoryMenuPart smp)
+    {
+        smp.ShowDetails = !smp.ShowDetails;
+    }
+
+    async void AddNewStoryMenuPart()
+    {
+        StoryMenuPart part = new StoryMenuPart { Title = "temp title" };
+        Menu menu = new Menu { Text = "temp text" };
+        part.Menus.Add(menu);
+        _workspaceService.WorkClass.StoryScript.StoryMenuParts.Add(part);
+        await Notify.InvokeAsync();
+    }
+
+    async void RemoveStoryMenuPart(StoryMenuPart smp)
+    {
+        _workspaceService.WorkClass.StoryScript.StoryMenuParts.Remove(smp);
+        await Notify.InvokeAsync();
+    }
+
+    void AddNewMenu(StoryMenuPart smp)
+    {
+        smp.Menus.Add(new Menu { Text = "temp text" });
+    }
+
+    void RemoveMenu(StoryMenuPart smp, Menu m)
+    {
+        try
+        {
+            _workspaceService.WorkClass.StoryScript.StoryMenuParts.FirstOrDefault(smp).Menus.Remove(m);
+        }
+        catch { }
     }
 }
