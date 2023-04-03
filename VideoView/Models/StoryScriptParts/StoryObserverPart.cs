@@ -10,7 +10,7 @@
 
     public class Period
     {
-        public int Time { get; set; }
+        public double Time { get; set; }
         public bool Done { get; set; } = false;
         public string Exec { get; set; } = string.Empty;
     }

@@ -76,7 +76,7 @@
     <RowTemplate>
         <MudTd>
             <MudButton OnClick="@(() => RemoveStoryMenuPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
-            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Menus</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">Talks</MudButton>
         </MudTd>
         <MudTd DataLabel="Title">@context.Title</MudTd>
         <MudTd DataLabel="Language">@context.Name</MudTd>
@@ -128,10 +128,10 @@
                                 <MudNumericField @bind-Value="MenuContext.OY" Required />
                             </MudTd>
                             <MudTd DataLabel="Text">
-                                <MudTextField @bind-Value="@MenuContext.Text" Required />
+                                <MudTextField @bind-Value="@MenuContext.Text" Required Immediate />
                             </MudTd>
                             <MudTd DataLabel="Action">
-                                <MudTextField @bind-Value="@MenuContext.Action" Required />
+                                <MudTextField @bind-Value="@MenuContext.Action" Required Immediate />
                             </MudTd>
                         </RowEditingTemplate>
                     </MudTable>
@@ -229,8 +229,8 @@
 
     async void AddNewStoryMenuPart()
     {
-        StoryMenuPart part = new StoryMenuPart { Title = "temp_title" };
-        Menu menu = new Menu { Text = "temp text" };
+        StoryMenuPart part = new StoryMenuPart { Title = "story_menu_talk" };
+        Menu menu = new Menu();
         part.Menus.Add(menu);
         _workspaceService.WorkClass.StoryScript.StoryMenuParts.Add(part);
         await Notify.InvokeAsync();
@@ -244,7 +244,7 @@
 
     void AddNewMenu(StoryMenuPart smp)
     {
-        smp.Menus.Add(new Menu { Text = "temp text" });
+        smp.Menus.Add(new Menu());
     }
 
     void RemoveMenu(StoryMenuPart smp, Menu m)

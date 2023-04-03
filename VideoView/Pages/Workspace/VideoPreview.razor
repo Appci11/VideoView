@@ -1,0 +1,123 @@
+﻿@page "/preview/{CategoryId}/{ProjectId}"
+
+@using VideoView.Models;
+@inject IJSRuntime JSRuntime
+@inject IWorkspaceService _workspaceService
+
+@if (vidLoaded)
+{
+    @*
+    <div class="d-flex flex-column p-2 align-content-center border border-info">
+        <BlazoredVideo @ref="video"
+                   EventFired="OnEvent"
+                   VideoEventOptions="options"
+                       class="w-100"
+                       loop="loop"
+                       style="max-width:800px;"
+                       controls="controls">
+            <source src="video_example.mp4" type="video/mp4" />
+        </BlazoredVideo>
+    </div>
+*@
+    @*
+    <BlazoredVideo @ref="video"
+                   class="w-100"
+                   style="max-width:800px;"
+                   controls="controls">
+        <source src="video_example.mp4" type="video/mp4" />
+    </BlazoredVideo>
+
+*@
+
+    <BlazoredVideo PlayEvent="OnPlay"
+                   @ref="video"
+                   TimeUpate="OnTimeUpdate"
+                   VideoStateOptions="options"
+                   class="w-100"
+                   style="max-width:800px;"
+                   controls="controls">
+        <source src="video_example.mp4" type="video/mp4" />
+    </BlazoredVideo>
+
+
+}
+
+@if (loaded)
+{
+    <MudText>@videoState</MudText>
+    @*
+    <MudButton OnClick="PlayVideo">
+
+    </MudButton>
+*@
+}
+
+@code {
+    [Parameter]
+    public string? CategoryId { get; set; }
+    [Parameter]
+    public string? ProjectId { get; set; }
+
+    bool loaded = false;
+
+    //Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+    string videoState = string.Empty;
+    //Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
+
+    void OnPlay(VideoState state)
+    {
+        var url = state.CurrentSrc;
+    }
+
+    void OnTimeUpdate(VideoState state)
+    {
+        var url = state.CurrentSrc;
+        var currentTime = state.CurrentTime;
+        videoState = currentTime.ToString();
+        StateHasChanged();
+    }
+
+    Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+
+
+    BlazoredVideo video;
+
+    //string vidId = string.Empty;
+    bool vidLoaded = false;
+    //double stopTime = 3.33;
+
+    WorkClass? work;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _workspaceService.GetProjectData(CategoryId!, ProjectId!);
+        work = _workspaceService.WorkClass;
+
+        //var allOptionsEnabled = new VideoStateOptions() { All = true };
+        //foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
+        //{
+        //    if (item != VideoEvents.NotSet)
+        //    {
+        //        options[item] = allOptionsEnabled;
+        //        eventCounter[item] = 0;
+        //    }
+        //}
+
+        options[VideoEvents.TimeUpdate] = new VideoStateOptions { CurrentTime = true, CurrentSrc = true };
+        options[VideoEvents.Play] = new VideoStateOptions { CurrentSrc = true };
+
+        vidLoaded = true;
+
+        loaded = true;
+    }
+
+    //void OnEvent(VideoEventData videoData)
+    //{
+    //    videoState = videoData.State;
+    //    if (videoData.EventName != VideoEvents.NotSet)
+    //    {
+    //        eventCounter[videoData.EventName]++;
+    //    }
+    //    StateHasChanged();
+    //}
+}

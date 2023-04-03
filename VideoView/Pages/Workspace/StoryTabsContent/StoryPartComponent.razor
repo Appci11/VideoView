@@ -92,8 +92,8 @@
 
 <MudTable Items="_workspaceService.WorkClass.StoryScript.StoryParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
+        <col style="width:220px;" />
         <col style="width:200px;" />
-        <col style="width:150px;" />
         <col style="width:180px;" />
     </ColGroup>
     <HeaderContent>
@@ -105,7 +105,7 @@
     <RowTemplate>
         <MudTd>
             <MudButton OnClick="@(() => RemoveStoryPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
-            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">T Points</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">T Points</MudButton>
         </MudTd>
         <MudTd DataLabel="Title">@context.Title</MudTd>
         <MudTd DataLabel="Language">@context.Name</MudTd>
@@ -114,20 +114,20 @@
     <RowEditingTemplate>
         <MudTd></MudTd>
         <MudTd DataLabel="Title">
-            <MudTextField @bind-Value="@context.Title" Required />
-        </MudTd>
-        <MudTd DataLabel="Language">
+            <MudTextField @bind-Value="@context.Title" Required Immediate Placeholder="Title of the story part" />
+            </MudTd>
+            <MudTd DataLabel="Language">
             <MudSelect @bind-Value="@context.Name" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Language" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 <MudSelectItem Value="@("en")">English</MudSelectItem>
                 <MudSelectItem Value="@("lt")">Lithuanian</MudSelectItem>
             </MudSelect>
-        </MudTd>
-        <MudTd DataLabel="Speech">
-            <MudTextField @bind-Value="@context.Speech" Required />
-        </MudTd>
-    </RowEditingTemplate>
-    <ChildRowContent>
-        @if (context.ShowDetails)
+            </MudTd>
+            <MudTd DataLabel="Speech">
+            <MudTextField @bind-Value="@context.Speech" Required Immediate Placeholder="Uri to .mp3 file (story part speech)" />
+            </MudTd>
+        </RowEditingTemplate>
+        <ChildRowContent>
+            @if (context.ShowDetails)
         {
             <MudTr>
                 <td colspan="4">
@@ -154,7 +154,7 @@
                                         <MudNumericField @bind-Value="@TalksContext.Wait" Required />
                                     </MudTd>
                                     <MudTd DataLabel="Text">
-                                        <MudTextField @bind-Value="@TalksContext.Text" Required />
+                                        <MudTextField @bind-Value="@TalksContext.Text" Required Immediate />
                                     </MudTd>
                                 </RowEditingTemplate>
                             </MudTable>
@@ -171,6 +171,7 @@
     public EventCallback Notify { get; set; }
 
     StoryPart storypart = new StoryPart();
+
     //List<Talk> Talks = new List<Talk> { new Talk() };
 
     int sk = -1;
@@ -316,8 +317,8 @@
 
     async void AddNewStoryPart()
     {
-        StoryPart part = new StoryPart { Title = "temp title" };
-        Talk talk = new Talk { Text = "temp text" };
+        StoryPart part = new StoryPart { Title = "story_part_" };
+        Talk talk = new Talk();
         part.Talks.Add(talk);
         _workspaceService.WorkClass.StoryScript.StoryParts.Add(part);
         await Notify.InvokeAsync();
@@ -331,7 +332,7 @@
 
     void AddNewTalk(StoryPart sp)
     {
-        sp.Talks.Add(new Talk { Text = "temp text" });
+        sp.Talks.Add(new Talk());
     }
 
     void RemoveTalk(StoryPart sp, Talk t)

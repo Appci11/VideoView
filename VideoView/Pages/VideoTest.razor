@@ -1,5 +1,5 @@
 ﻿@page "/videotest"
-
+@*
 <h1>Blazored Video Demo - All events and all state monitored</h1>
 
 <style>
@@ -81,7 +81,8 @@
 		</BlazoredVideo>
 	</div>
 </div>
-
+*@
+@*
 @code {
 	Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
 	VideoState videoState;
@@ -109,4 +110,85 @@
 		}
 		StateHasChanged();
 	}
+}
+*@
+
+
+<div class="d-flex flex-column p-2 align-content-center border border-info">
+    <BlazoredVideo TimeUpdateEvent="OnEvent"
+                   @ref="video"
+                   VideoEventOptions="options"
+                   class="w-100"
+                   style="max-width:800px;"
+                   controls="controls">
+        <source src="video_example.mp4" type="video/mp4" />
+    </BlazoredVideo>
+
+</div>
+
+<MudText>@videoState.CurrentTime</MudText>
+
+<MudButton OnClick="StartPlayingVid">Play</MudButton>
+
+@code {
+	Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+	VideoState videoState = new();
+	Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
+	BlazoredVideo video;
+
+	protected override void OnInitialized()
+	{
+		foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
+		{
+			if (item != VideoEvents.NotSet)
+			{
+				eventCounter[item] = 0;
+			}
+		}
+		options[VideoEvents.TimeUpdate] = new VideoStateOptions { CurrentTime = true };
+	}
+
+	double[] arr = { 3.0, 6.0, 9.0 };
+	double currentStopTime = 0;
+
+	void StartPlayingVid()
+	{
+		if (arr[arr.Length - 1] < videoState.CurrentTime)    //jei didziausias laikas jau praejo...
+		{
+			currentStopTime = 99999;
+			PlayVid();
+		}
+		else
+		{
+			for (int i = 0; i < arr.Length - 1; i++)
+			{
+				currentStopTime = arr[i];
+				if (currentStopTime > videoState.CurrentTime) break;
+				currentStopTime = arr[arr.Length - 1];
+			}
+			Console.WriteLine("Current time: " + videoState.CurrentTime);
+			Console.WriteLine("Will stop at: " + currentStopTime);
+			PlayVid();
+		}
+	}
+
+	void PlayVid()
+	{
+		video.StartPlayback();
+	}
+
+	void StopVid()
+	{
+		video.PausePlayback();
+	}
+
+	void OnEvent(VideoState state)
+	{
+		videoState = state;
+		if (state.CurrentTime > currentStopTime)
+		{
+			StopVid();
+		}
+		eventCounter[VideoEvents.TimeUpdate]++;
+    }
 }

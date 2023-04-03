@@ -49,7 +49,7 @@
 
         <MudTable Items="_workspaceService.WorkClass.StoryScript.StoryObserverParts" Dense="true" RowStyle="background-color:#F6F6F6">
             <ColGroup>
-                <col style="width:200px;" />
+                <col style="width:220px;" />
                 <col style="width:200px;" />
             </ColGroup>
             <HeaderContent>
@@ -60,7 +60,7 @@
             <RowTemplate>
                 <MudTd>
                     <MudButton OnClick="@(() => RemoveStoryObserverPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
-                    <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Periods</MudButton>
+                    <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">Periods</MudButton>
                 </MudTd>
                 <MudTd DataLabel="Title">@context.Title</MudTd>
                 <MudTd DataLabel="Video Uri">@context.VideoUri</MudTd>
@@ -68,10 +68,10 @@
             <RowEditingTemplate>
                 <MudTd></MudTd>
                 <MudTd DataLabel="Title">
-                    <MudTextField @bind-Value="@context.Title" Required />
+                    <MudTextField @bind-Value="@context.Title" Required Immediate />
                 </MudTd>
                 <MudTd DataLabel="Video Uri">
-                    <MudTextField @bind-Value="@context.VideoUri" Required />
+                    <MudTextField @bind-Value="@context.VideoUri" Required Immediate />
                 </MudTd>
             </RowEditingTemplate>
             <ChildRowContent>
@@ -215,8 +215,8 @@
         try
         {
             double sk = videoState.CurrentTime;
-            int sk1 = (int)sk;
-            AddPeriod(sk1);
+            Console.WriteLine(sk);
+            AddPeriod(sk);
         }
         catch { }
     }
@@ -232,7 +232,7 @@
         storyobserverpart.Periods.Add(new Period());
     }
 
-    void AddPeriod(int sk)
+    void AddPeriod(double sk)
     {
         storyobserverpart.Periods.Add(new Period { Time = sk });
     }
@@ -301,7 +301,7 @@
 
     async void AddNewStoryObserverPart()
     {
-        StoryObserverPart part = new StoryObserverPart { Title = "temp_title" };
+        StoryObserverPart part = new StoryObserverPart { Title = "story_observer" };
         Period period = new Period();
         part.Periods.Add(period);
         _workspaceService.WorkClass.StoryScript.StoryObserverParts.Add(part);
@@ -322,14 +322,12 @@
     private void AddNewPeriodFromVideo()
     {
         double sk;
-        int sk1;
         if (null != videoState)
         {
             sk = videoState.CurrentTime;
-            sk1 = (int)sk;
         }
-        else sk1 = 0;
-        _workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Add(new Period { Time = sk1 });
+        else sk = 0;
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Add(new Period { Time = Math.Round(sk, 2, MidpointRounding.AwayFromZero) });
     }
 
     void RemovePeriod(StoryObserverPart sop, Period p)

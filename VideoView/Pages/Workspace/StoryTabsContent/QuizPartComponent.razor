@@ -122,7 +122,7 @@
 
 <MudTable Items="_workspaceService.WorkClass.StoryScript.QuizParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
-        <col style="width:200px;" />
+        <col style="width:220px;" />
         <col style="width:150px;" />
         <col style="width:180px;" />
         <col style="width:150px;" />
@@ -138,7 +138,7 @@
     <RowTemplate>
         <MudTd>
             <MudButton OnClick="@(() => RemoveQuizPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
-            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Options</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">Options</MudButton>
         </MudTd>
         <MudTd DataLabel="Title">@context.Title</MudTd>
         <MudTd DataLabel="Language">@context.Name</MudTd>
@@ -175,8 +175,9 @@
                             <col style="width:100px;" />
                             <col style="width:100px;" />
                             <col style="width:100px;" />
-                            <col style="width:350px;" />
-                            <col style="width:350px;" />
+                            <col/>
+                            <col/>
+                            <col />
                         </ColGroup>
                         <HeaderContent>
                             <MudTh><MudIconButton OnClick="@(() => AddNewOption(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
@@ -213,13 +214,13 @@
                                 <MudCheckBox @bind-Checked="QuizContext.IsTrue"></MudCheckBox>
                             </MudTd>
                             <MudTd DataLabel="Text">
-                                <MudTextField @bind-Value="@QuizContext.Text" Required />
+                                <MudTextField @bind-Value="@QuizContext.Text" Required Immediate Placeholder="Text" />
                             </MudTd>
                             <MudTd DataLabel="Answer">
-                                <MudTextField @bind-Value="@QuizContext.Answer" Required />
+                                <MudTextField @bind-Value="@QuizContext.Answer" Required Immediate Placeholder="Answer" />
                             </MudTd>
                             <MudTd DataLabel="Speech">
-                                <MudTextField @bind-Value="@QuizContext.Speech" Required />
+                                <MudTextField @bind-Value="@QuizContext.Speech" Required Immediate Placeholder="Uri to .mp3 file" />
                             </MudTd>
                         </RowEditingTemplate>
                     </MudTable>
@@ -372,8 +373,8 @@
 
     async void AddNewQuizPart()
     {
-        QuizPart part = new QuizPart { Title = "temp_title" };
-        Option option = new Option { Text = "temp text" };
+        QuizPart part = new QuizPart { Title = "quiz_part_" };
+        Option option = new Option();
         part.Options.Add(option);
         _workspaceService.WorkClass.StoryScript.QuizParts.Add(part);
         await Notify.InvokeAsync();
@@ -387,7 +388,7 @@
 
     void AddNewOption(QuizPart qp)
     {
-        qp.Options.Add(new Option { Text = "temp text" });
+        qp.Options.Add(new Option());
     }
 
     void RemoveOption(QuizPart qp, Option o)
