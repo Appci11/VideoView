@@ -166,9 +166,8 @@
     <ChildRowContent>
         @if (context.ShowDetails)
         {
-            <td colspan="7">
+            <td colspan="8">
                 <MudCard Elevation="0">
-
                     <MudTable Items="@context.Options" Context="QuizContext" Hover="true">
                         <ColGroup>
                             <col style="width:20px;" />
@@ -176,7 +175,8 @@
                             <col style="width:100px;" />
                             <col style="width:100px;" />
                             <col style="width:100px;" />
-                            <col style="width:400px;" />
+                            <col style="width:350px;" />
+                            <col style="width:350px;" />
                         </ColGroup>
                         <HeaderContent>
                             <MudTh><MudIconButton OnClick="@(() => AddNewOption(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
@@ -186,6 +186,7 @@
                             <MudTh>Is True</MudTh>
                             <MudTh>Text</MudTh>
                             <MudTh>Answer</MudTh>
+                            <MudTh>Speech</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd><MudIconButton OnClick="@(() => RemoveOption(context, QuizContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
@@ -195,6 +196,7 @@
                             <MudTd DataLabel="Is True">@QuizContext.IsTrue</MudTd>
                             <MudTd DataLabel="Text">@QuizContext.Text</MudTd>
                             <MudTd DataLabel="Answer">@QuizContext.Answer</MudTd>
+                            <MudTd DataLabel="Speech">@QuizContext.Speech</MudTd>
                         </RowTemplate>
                         <RowEditingTemplate>
                             <MudTd></MudTd>
@@ -215,6 +217,9 @@
                             </MudTd>
                             <MudTd DataLabel="Answer">
                                 <MudTextField @bind-Value="@QuizContext.Answer" Required />
+                            </MudTd>
+                            <MudTd DataLabel="Speech">
+                                <MudTextField @bind-Value="@QuizContext.Speech" Required />
                             </MudTd>
                         </RowEditingTemplate>
                     </MudTable>
@@ -367,7 +372,7 @@
 
     async void AddNewQuizPart()
     {
-        QuizPart part = new QuizPart { Title = "temp title" };
+        QuizPart part = new QuizPart { Title = "temp_title" };
         Option option = new Option { Text = "temp text" };
         part.Options.Add(option);
         _workspaceService.WorkClass.StoryScript.QuizParts.Add(part);

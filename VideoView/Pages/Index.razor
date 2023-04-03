@@ -140,6 +140,7 @@ Welcome to your new app.
         {
             projectName = value;
             SelectProject(projectName);
+            OnValueChanged(value);
         }
     }
 
@@ -261,7 +262,7 @@ Welcome to your new app.
                 pro.fields.name.stringValue = eil;
                 await _projectsService.AddProject(pro, CategoryId);
                 Projects = await _projectsService.GetAllProjects(CategoryId);
-                goToWorkspaceDisabled = false;
+                //goToWorkspaceDisabled = false;
                 StateHasChanged();
             }
         }
@@ -269,14 +270,24 @@ Welcome to your new app.
 
     async void RemoveProject()
     {
-        if(CategoryId != null && ProjectId != null)
+        if (CategoryId != null && ProjectId != null)
         {
             if (CategoryId.Length > 0 && ProjectId.Length > 0)
             {
                 await _projectsService.DeleteCategory(CategoryId, ProjectId);
                 GetProjects();
+                ProjectName = string.Empty;
+                goToWorkspaceDisabled = true;
                 StateHasChanged();
             }
+        }
+    }
+
+    void OnValueChanged(string selected)
+    {
+        if (selected != null && selected != string.Empty)
+        {
+            goToWorkspaceDisabled = false;
         }
     }
 }

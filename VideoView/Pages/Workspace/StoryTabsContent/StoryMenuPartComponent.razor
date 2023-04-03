@@ -76,7 +76,7 @@
     <RowTemplate>
         <MudTd>
             <MudButton OnClick="@(() => RemoveStoryMenuPart(context))" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">RMV</MudButton>
-            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Options</MudButton>
+            <MudButton OnClick="@(() => ShowBtnPress(context))" Variant="Variant.Outlined" Size="Size.Small">Menus</MudButton>
         </MudTd>
         <MudTd DataLabel="Title">@context.Title</MudTd>
         <MudTd DataLabel="Language">@context.Name</MudTd>
@@ -229,7 +229,7 @@
 
     async void AddNewStoryMenuPart()
     {
-        StoryMenuPart part = new StoryMenuPart { Title = "temp title" };
+        StoryMenuPart part = new StoryMenuPart { Title = "temp_title" };
         Menu menu = new Menu { Text = "temp text" };
         part.Menus.Add(menu);
         _workspaceService.WorkClass.StoryScript.StoryMenuParts.Add(part);

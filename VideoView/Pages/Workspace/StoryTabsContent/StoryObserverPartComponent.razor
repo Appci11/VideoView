@@ -301,7 +301,7 @@
 
     async void AddNewStoryObserverPart()
     {
-        StoryObserverPart part = new StoryObserverPart { Title = "temp title" };
+        StoryObserverPart part = new StoryObserverPart { Title = "temp_title" };
         Period period = new Period();
         part.Periods.Add(period);
         _workspaceService.WorkClass.StoryScript.StoryObserverParts.Add(part);
