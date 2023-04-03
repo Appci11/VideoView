@@ -15,6 +15,7 @@
 @inject IAuthService _authService
 @inject ILocalStorageService _localStorage
 @inject IDialogService _dialogService
+@inject ISnackbar Snackbar
 
 <AuthorizeView>
     <NotAuthorized>
@@ -26,7 +27,7 @@
         @if (loaded)
         {
             <div>
-                <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
+                <MudContainer MaxWidth="MaxWidth.Small" Class="d-inline-flex pa-4">
                     <MudSelect @bind-Value="@CategoryName" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @if (Categories != null)
                         {
@@ -37,8 +38,8 @@
                         }
                     </MudSelect>
                 </MudContainer>
-                <MudIconButton OnClick="OpenAddCategoryDialog" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="Add"></MudIconButton>
-                <MudIconButton Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
+                <MudFab OnClick="OpenAddCategoryDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
+                <MudFab OnClick="RemoveCategory" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
             </div>
             <div style="padding-bottom=20px">
                 <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
@@ -52,8 +53,8 @@
                         }
                     </MudSelect>
                 </MudContainer>
-                <MudIconButton OnClick="OpenAddProjectDialog" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="Add"></MudIconButton>
-                <MudIconButton OnClick="RemoveProject" Class="d-inline-flex pa-4" ButtonType="ButtonType.Button" Color="Color.Secondary" Icon="@Icons.Material.Filled.RemoveCircle" aria-label="Remove"></MudIconButton>
+                <MudFab OnClick="OpenAddProjectDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
+                <MudFab OnClick="RemoveProject" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
             </div>
             <MudButton OnClick="GoToWorkspace"
                    Target="_blank"
@@ -63,54 +64,14 @@
                    Disabled=@goToWorkspaceDisabled>
                 Go To Project
             </MudButton>
-
-            @*            @if (categoriesExist)
-        {
-        <label for="category">Rastos kategorijos</label>
-        <select id="category" class="form-select" @onchange="GetProjects">
-        <option value="" selected disabled hidden>Pasirinkti kategoriją</option>
-        @foreach (Category category in Categories!)
-        {
-        <option value="@category.name">@category.fields.name.stringValue</option>
-        }
-        </select>
-        <br />
-        <label for="project">Rasti projektai</label>
-        <select id="project" class="form-select" disabled="@projectsSelectionDisabled" @onchange="@SelectProject">
-        <option value="" selected disabled hidden>Pasirinkti projektą</option>
-        @if (Projects != null)
-        {
-        @foreach (Project project in Projects!)
-        {
-        <option value="@project.name">@project.fields.name.stringValue</option>
-        }
-        }
-        </select>
-        <br />
-        <div>
-        @errorText
-        </div>
-        <button class="btn btn-primary" @onclick="GoToWorkspace" disabled="@goToWorkspaceDisabled">Eiti i projektą</button>
-        }*@
         }
         else
         {
             <a>Getting data from database...</a>
         }
-
-
     </Authorized>
 </AuthorizeView>
 
-@*
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-*@
 @code {
     List<Category>? Categories;
     string CategoryId { get; set; } = string.Empty;
@@ -126,7 +87,10 @@ Welcome to your new app.
         set
         {
             categoryName = value;
-            GetProjects();
+            if (value != string.Empty)
+            {
+                GetProjects();
+            }
         }
     }
     string projectName = string.Empty;
@@ -187,24 +151,7 @@ Welcome to your new app.
         Projects = await _projectsService.GetAllProjects(CategoryId);
         projectsSelectionDisabled = false;
         StateHasChanged();
-
     }
-
-    //async void GetProjects(ChangeEventArgs e)
-    //{
-    //    CategoryId = e.Value.ToString().Split('/').Last();
-    //    Projects = await _projectsService.GetAllProjects(CategoryId);
-    //    if (Projects != null && Projects.Count > 0)
-    //    {
-    //        projectsSelectionDisabled = false;
-    //        StateHasChanged();
-    //    }
-    //    else
-    //    {
-    //        errorText = "Pasirinkta kategorija neturi nei vieno projekto.";
-    //        StateHasChanged();
-    //    }
-    //}
 
     void SelectProject(string e)
     {
@@ -212,13 +159,6 @@ Welcome to your new app.
         goToWorkspaceDisabled = false;
         StateHasChanged();
     }
-
-    //void SelectProject(ChangeEventArgs e)
-    //{
-    //    ProjectId = e.Value.ToString().Split('/').Last();
-    //    goToWorkspaceDisabled = false;
-    //    StateHasChanged();
-    //}
 
     void GoToLogin()
     {
@@ -245,6 +185,7 @@ Welcome to your new app.
                 cat.fields.name.stringValue = eil;
                 await _categoriesService.AddCategory(cat);
                 Categories = await _categoriesService.GetAllCategories();
+                Snackbar.Add("Category added.", Severity.Success);
             }
         }
     }
@@ -262,8 +203,36 @@ Welcome to your new app.
                 pro.fields.name.stringValue = eil;
                 await _projectsService.AddProject(pro, CategoryId);
                 Projects = await _projectsService.GetAllProjects(CategoryId);
-                //goToWorkspaceDisabled = false;
+                Snackbar.Add("Project added.", Severity.Success);
                 StateHasChanged();
+            }
+        }
+    }
+
+    async void RemoveCategory()
+    {
+        if (CategoryId != null)
+        {
+            if (CategoryId.Length > 0)
+            {
+                var parameters = new DialogParameters();
+                parameters.Add("BodyText", "Delete category?");
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+                var dialog = _dialogService.Show<ConfirmDeletionDialog>("Category deletion", parameters, options);
+
+                if (!(await dialog.Result).Canceled)
+                {
+                    if (await _categoriesService.DeleteCategory(CategoryId))
+                    {
+                        Categories = await _categoriesService.GetAllCategories();
+                    }
+
+                    //ProjectName = string.Empty;
+                    CategoryName = string.Empty;
+                    goToWorkspaceDisabled = true;
+                    Snackbar.Add("Category removed.", Severity.Warning);
+                    StateHasChanged();
+                }
             }
         }
     }
@@ -274,11 +243,20 @@ Welcome to your new app.
         {
             if (CategoryId.Length > 0 && ProjectId.Length > 0)
             {
-                await _projectsService.DeleteCategory(CategoryId, ProjectId);
-                GetProjects();
-                ProjectName = string.Empty;
-                goToWorkspaceDisabled = true;
-                StateHasChanged();
+                var parameters = new DialogParameters();
+                parameters.Add("BodyText", "Delete project?");
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+                var dialog = _dialogService.Show<ConfirmDeletionDialog>("Project deletion", parameters, options);
+
+                if (!(await dialog.Result).Canceled)
+                {
+                    await _projectsService.DeleteProject(CategoryId, ProjectId);
+                    GetProjects();
+                    ProjectName = string.Empty;
+                    goToWorkspaceDisabled = true;
+                    Snackbar.Add("Project removed.", Severity.Warning);
+                    StateHasChanged();
+                }
             }
         }
     }

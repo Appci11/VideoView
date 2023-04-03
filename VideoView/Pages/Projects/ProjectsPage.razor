@@ -87,7 +87,7 @@ else
     async void Delete_Click(Project p)
     {
         string id = p.name.Split('/').Last();
-        await _projectsService.DeleteCategory(categoryId, id);
+        await _projectsService.DeleteProject(categoryId, id);
         List<Project> response = await _projectsService.GetAllProjects(categoryId);
         if(response != null)
         {

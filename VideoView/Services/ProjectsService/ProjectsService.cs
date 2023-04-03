@@ -70,7 +70,7 @@ namespace VideoView.Services.ProjectsService
             return false;
         }
 
-        public async Task<bool> DeleteCategory(string categoryId, string id)
+        public async Task<bool> DeleteProject(string categoryId, string id)
         {
             string uId = await _localStorage.GetItemAsync<string>("userId");
             var response = await _http.DeleteAsync($"{resUrl}{databaseUrl}documents/users/{uId}/categories/{categoryId}/projects/{id}");

@@ -8,6 +8,6 @@ namespace VideoView.Services.ProjectsService
         public Task<Project> GetProjectById(string categoryId, string id);
         public Task<bool> AddProject(Project project, string categoryId);
         public Task<bool> UpdateProject(Project project, string categoryId, string id);
-        public Task<bool> DeleteCategory(string categoryId, string id);
+        public Task<bool> DeleteProject(string categoryId, string id);
     }
 }
