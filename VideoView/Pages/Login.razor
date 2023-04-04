@@ -9,7 +9,7 @@
 <body>
     <h3>Login</h3>
 
-    <EditForm Model="user" OnSubmit="HandleLogin">
+@*    <EditForm Model="user" OnSubmit="HandleLogin">
         <div>
             <InputText id="email" @bind-Value="user.email" type="email" />
             <label for="email">Email</label>
@@ -21,7 +21,16 @@
         <div>
             <button type="submit" class="btn btn-primary">Login</button>
         </div>
-    </EditForm>
+    </EditForm>*@
+    <MudItem xs="12" sm="7" Style="padding-bottom:5px;">
+        <EditForm Model="@user" OnValidSubmit="HandleLogin">
+            <MudTextField @bind-Value="user.email" T="string" Label="E-mail" Required="true" @ref="focusTarget" />
+            <MudTextField @bind-Value="user.password" T="string" Label="Password" InputType="InputType.Password" Required="true" />
+            <br />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Prisijungti</MudButton>
+        </EditForm>
+    </MudItem>
+
     <br />
     <input id="stayLoggedInCheck" type="checkbox" @bind="stayLoggedIn">
     <label for="stayLoggedInCheck">Likti prisijungus</label>
@@ -29,21 +38,20 @@
     <p style="color: red">@ErrorMsg</p>
     <br />
     <div>
-        Not a member? <a href="register">Register</a>
+        Do not have account? <a href="register">Register</a>
     </div>
 </body>
 
 @code {
     AuthUserDto user = new AuthUserDto();
-    private InputText? inputTextForFocus;
+    private MudTextField<string> focusTarget;
     private string ErrorMsg = string.Empty;
     public bool stayLoggedIn { get; set; } = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            if (inputTextForFocus?.Element != null)
-                await inputTextForFocus.Element.Value.FocusAsync();
+            focusTarget.FocusAsync();
     }
 
     async Task HandleLogin()

@@ -6,8 +6,8 @@
 @inject IAuthService _authService
 
 <body>
-    <h3>Register</h3>
-
+    <h3>Registration</h3>
+@*
     <EditForm Model="user" OnSubmit="HandleRegister">
         <div>
             <InputText id="email" @bind-Value="user.email" type="email" />
@@ -28,19 +28,38 @@
     <br />
     <p style="color: red">@ErrorMsg</p>
     <br />
+*@
+
+
+    <MudItem xs="12" sm="7" Style="padding-bottom:5px;">
+        <EditForm Model="@user" OnValidSubmit="HandleRegister">
+            <MudTextField @bind-Value="user.email" T="string" Label="E-mail" Required="true" @ref="focusTarget" />
+            <MudTextField @bind-Value="user.password" T="string" Label="Password" InputType="InputType.Password" Required="true" />
+            <MudTextField @bind-Value="@Pass2" T="string" Label="Repeat password" InputType="InputType.Password" Required="true" />
+
+            <br />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Prisijungti</MudButton>
+        </EditForm>
+        <MudText Color="Color.Secondary" Style="padding-top:10px;">@ErrorMsg</MudText>
+    </MudItem>
+    <p style="color: red">@ErrorMsg</p>
+
 </body>
+
+
 
 @code {
     AuthUserDto user = new AuthUserDto();
-    private InputText? inputTextForFocus;
+    //private InputText? inputTextForFocus;
     private string ErrorMsg = string.Empty;
     private string Pass2 = string.Empty;
+    MudTextField<string> focusTarget;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            if (inputTextForFocus?.Element != null)
-                await inputTextForFocus.Element.Value.FocusAsync();
+            //if (inputTextForFocus?.Element != null)
+                await focusTarget.FocusAsync();
     }
 
     async Task HandleRegister()
