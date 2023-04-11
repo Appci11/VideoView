@@ -1,6 +1,10 @@
-﻿@using VideoView.Models.StoryScriptParts
+﻿@using System.Net.Http.Headers;
+@using Newtonsoft.Json;
+@using VideoView.Models.StoryScriptParts
+@using VideoView.Models;
 @inject IWorkspaceService _workspaceService
 @inject IJSRuntime _jsRuntime
+@inject HttpClient _http
 
 <div class="grid-container">
     <!-- LEFT SIDE -->
@@ -79,31 +83,45 @@
     </div>
     <!-- RIGHT SIDE -->
     <div>
-        @if (vidLoaded)
+        @if (_workspaceService.VideoToken != string.Empty)
         {
-            <div class="d-flex flex-column p-2 align-content-center border border-info">
-                <BlazoredVideo TimeUpdateEvent="OnEvent"
+            @if (vidLoaded)
+            {
+                <div class="d-flex flex-column p-2 align-content-center border border-info">
+                    <BlazoredVideo TimeUpdateEvent="OnEvent"
                            VideoEventOptions="options"
-                               class="w-100"
-                               style="max-width:800px;"
-                               controls="controls">
-                    <source src="video_example.mp4" type="video/mp4" />
-                </BlazoredVideo>
-            </div>
-        }
-        <div>
-            <div id="player"></div>
-            <br />
-
-            @*<button class="btn btn-primary" @onclick="GetCurrentVideoTime">Add Period With Current Video Time</button>*@
-            <MudButton OnClick="AddNewPeriodFromVideo"
+                                   class="w-100"
+                                   style="max-width:800px;"
+                                   controls="controls">
+                        @*<source src="video_example.mp4" type="video/mp4" />*@
+                        @*<source src="https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/video%2Fvideo_example.mp4?alt=media&token=81eb1176-eccb-4eba-b782-0d117b3994c5" type="video/mp4" />*@
+                        <source src="@_workspaceService.VideoUrl?alt=media&token=@_workspaceService.VideoToken" type="video/mp4" />
+                    </BlazoredVideo>
+                </div>
+            }
+            <div>
+                <div id="player"></div>
+                <br />
+                <MudButton OnClick="AddNewPeriodFromVideo"
                        Target="_blank"
                        Variant="Variant.Filled"
                        StartIcon="@Icons.Material.Filled.ArrowBack"
                        Color="Color.Primary">
-                Add Period
-            </MudButton>
-        </div>
+                    Add Period
+                </MudButton>
+            </div>
+        }
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           for="@context">
+                    Upload Video
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
         <hr />
     </div>
 </div>
@@ -111,6 +129,8 @@
 @code {
     [Parameter]
     public EventCallback Notify { get; set; }
+    [Parameter]
+    public string VideoUrl { get; set; } = string.Empty;
 
     StoryObserverPart storyobserverpart = new StoryObserverPart();
 
@@ -138,20 +158,39 @@
         vidLoaded = true;
     }
 
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    async void UploadFiles(IBrowserFile file)
+    {
+        vidLoaded = false;
+        StateHasChanged();
+        files.Add(file);
+        MemoryStream ms = new MemoryStream();
+        await file.OpenReadStream(file.Size).CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        HttpRequestMessage postRequest = new();
+        postRequest = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, _workspaceService.VideoUrl);
+        postRequest.Content = new ByteArrayContent(bytes);
+        postRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+        HttpResponseMessage response = await _http.SendAsync(postRequest);
+        var jsonString = response.Content.ReadAsStringAsync().Result;
+        FileUploadResponse resp = JsonConvert.DeserializeObject<FileUploadResponse>(jsonString);
+        try
+        {
+            _workspaceService.VideoToken = resp.downloadTokens;
+        }
+        catch{}
+        vidLoaded = true;
+        StateHasChanged();
+    }
+
     void LoadVideo()
     {
-        //string[] arr = storyobserverpart.VideoUri.Split("watch?v=");
-        //vidId = arr[1];
-        //Console.WriteLine("got into LoadVideo");
-        //_jsRuntime.InvokeVoidAsync("initializePlayer", vidId);
-
         vidLoaded = true;
         StateHasChanged();
     }
 
     private async Task GetCurrentVideoTime()
     {
-        //double sk = await _jsRuntime.InvokeAsync<double>("getTime");
         try
         {
             double sk = videoState.CurrentTime;

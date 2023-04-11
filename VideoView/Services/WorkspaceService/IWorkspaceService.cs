@@ -12,6 +12,8 @@ namespace VideoView.Services.WorkspaceService
         public string projectName { get; set; }
         public Project Project { get; set; }
         public WorkClass WorkClass { get; set; }
+        public string VideoUrl { get; set; }
+        public string VideoToken { get; set; }
 
         public Task GetProjectData(string categoryId, string projectId);
         public Task<bool> SendProjectDataToServer();

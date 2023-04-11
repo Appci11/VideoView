@@ -26,8 +26,8 @@
     <Authorized>
         @if (loaded)
         {
-            <div>
-                <MudContainer MaxWidth="MaxWidth.Small" Class="d-inline-flex pa-4">
+            <MudPaper Elevation="0" Class="d-flex flex-row">
+                <MudPaper Elevation="0" Width="300px">
                     <MudSelect @bind-Value="@CategoryName" Margin="Margin.Dense" Dense="true" FullWidth="false" T="string" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @if (Categories != null)
                         {
@@ -37,12 +37,14 @@
                             }
                         }
                     </MudSelect>
-                </MudContainer>
-                <MudFab OnClick="OpenAddCategoryDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
-                <MudFab OnClick="RemoveCategory" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
-            </div>
-            <div style="padding-bottom=20px">
-                <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-inline-flex pa-4">
+                </MudPaper>
+                <div>
+                    <MudFab OnClick="OpenAddCategoryDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
+                    <MudFab OnClick="RemoveCategory" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
+                </div>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="d-flex flex-row">
+                <MudPaper Elevation="0" Width="300px">
                     <MudSelect @bind-Value="ProjectName" Margin="Margin.Dense" Disabled="@projectsSelectionDisabled" Dense="true" FullWidth="false" T="string" Label="Project" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @if (Projects != null)
                         {
@@ -52,20 +54,23 @@
                             }
                         }
                     </MudSelect>
-                </MudContainer>
-                <MudFab OnClick="OpenAddProjectDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
-                <MudFab OnClick="RemoveProject" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
-            </div>
+                </MudPaper>
+                <div>
+                    <MudFab OnClick="OpenAddProjectDialog" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="d-inline-flex pa-4" />
+                    <MudFab OnClick="RemoveProject" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Remove" Size="Size.Small" Class="d-inline-flex pa-4" />
+                </div>
+            </MudPaper>
             <MudButton OnClick="GoToWorkspace"
                    Target="_blank"
                    Variant="Variant.Filled"
                    EndIcon="@Icons.Material.Filled.ArrowForward"
                    Color="Color.Primary"
-                   Disabled=@goToWorkspaceDisabled>
+                   Disabled=@goToWorkspaceDisabled
+                   Style="margin-top:15px;">                   
                 Go To Project
             </MudButton>
             <br />
-            <br/>
+            <br />
             <MudButton OnClick="GoToPreview"
                    Target="_blank"
                    Variant="Variant.Filled"
@@ -81,7 +86,6 @@
         }
     </Authorized>
 </AuthorizeView>
-
 @code {
     List<Category>? Categories;
     string CategoryId { get; set; } = string.Empty;

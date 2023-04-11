@@ -49,8 +49,7 @@ namespace VideoView.Services.ProjectsService
         {
             string uId = await _localStorage.GetItemAsync<string>("userId");
             var response = await _http.PostAsJsonAsync($"{resUrl}{databaseUrl}documents/users/{uId}/categories/{categoryId}/projects",
-                new {fields = project.fields});           
-            
+                new {fields = project.fields});               
             if (response != null)
             {
                 return true;

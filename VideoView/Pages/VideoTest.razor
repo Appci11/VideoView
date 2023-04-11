@@ -1,5 +1,9 @@
 ﻿@page "/videotest"
-
+@using System.Net.Http.Headers;
+@using VideoView.Models;
+@inject HttpClient _http
+@inject ILocalStorageService _localStorage
+@*
 <div class="d-flex flex-column p-2 align-content-center border border-info">
     <BlazoredVideo TimeUpdateEvent="OnEvent"
                    @ref="video"
@@ -7,73 +11,158 @@
                    class="w-100"
                    style="max-width:800px;"
                    controls="controls">
-        <source src="video_example.mp4" type="video/mp4" />
+        <source src="https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/video_example.mp4?alt=media&token=3f61916b-f666-4596-bac1-77358964b6f9" type="video/mp4" />
     </BlazoredVideo>
 </div>
-
+*@
 <MudText>@videoState.CurrentTime</MudText>
 
 <MudButton OnClick="StartPlayingVid">Play</MudButton>
 
+<br />
+<br />
+<MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+    <ButtonTemplate>
+        <MudButton HtmlTag="label"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                   for="@context">
+            Upload Files
+        </MudButton>
+    </ButtonTemplate>
+</MudFileUpload>
+
+
+
+<MudButton OnClick="Download" ButtonType="ButtonType.Button">Download</MudButton>
+<MudButton OnClick="ActuallyUpload" ButtonType="ButtonType.Button">actually do sht</MudButton>
+<MudText>@exists</MudText>
 @code {
-	Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
-	VideoState videoState = new();
-	Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
-	BlazoredVideo video;
+    //https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/bandymas.txt?alt=media&token=af94b2a8-e673-4774-ae00-ca430d7a9775
+    bool exists;
 
-	protected override void OnInitialized()
-	{
-		foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
-		{
-			if (item != VideoEvents.NotSet)
-			{
-				eventCounter[item] = 0;
-			}
-		}
-		options[VideoEvents.TimeUpdate] = new VideoStateOptions { CurrentTime = true };
-	}
 
-	double[] arr = { 3.0, 6.0, 9.0 };
-	double currentStopTime = 0;
 
-	void StartPlayingVid()
-	{
-		if (arr[arr.Length - 1] < videoState.CurrentTime)    //jei didziausias laikas jau praejo...
-		{
-			currentStopTime = 99999;
-			PlayVid();
-		}
-		else
-		{
-			for (int i = 0; i < arr.Length - 1; i++)
-			{
-				currentStopTime = arr[i];
-				if (currentStopTime > videoState.CurrentTime) break;
-				currentStopTime = arr[arr.Length - 1];
-			}
-			Console.WriteLine("Current time: " + videoState.CurrentTime);
-			Console.WriteLine("Will stop at: " + currentStopTime);
-			PlayVid();
-		}
-	}
 
-	void PlayVid()
-	{
-		video.StartPlayback();
-	}
 
-	void StopVid()
-	{
-		video.PausePlayback();
-	}
 
-	void OnEvent(VideoState state)
-	{
-		videoState = state;
-		if (state.CurrentTime > currentStopTime)
-		{
-			StopVid();
-		}
-		eventCounter[VideoEvents.TimeUpdate]++;
+    private int maxAllowedFiles = int.MaxValue;
+    private long maxFileSize = long.MaxValue;
+    private List<string> fileNames = new();
+
+    async void ActuallyUpload()
+    {
+        using var content = new MultipartFormDataContent();
+        foreach (var file in files)
+        {
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+            fileNames.Add(file.Name);
+
+            content.Add(
+                content: fileContent,
+                name: "\"files\"",
+                fileName: file.Name);
+        }
+
+        var response = await _http.PostAsync("https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o", content);
+    }
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    async void UploadFiles(IBrowserFile file)
+    {
+        files.Add(file);
+
+        MemoryStream ms = new MemoryStream();
+        await file.OpenReadStream(file.Size).CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        HttpRequestMessage postRequest = new();        
+        postRequest = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, "https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/bandymas.txt");
+        postRequest.Content = new ByteArrayContent(bytes);
+        postRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
+            
+        var response = await _http.SendAsync(postRequest);
+        //FileUploadResponse need = await response.Content.ReadAsStringAsync();
+    }
+
+    void Download()
+    {
+        //VideoExists();
+    }
+
+    async Task<bool> VideoExists()
+    {
+        string uId = await _localStorage.GetItemAsync<string>("userId");
+        HttpResponseMessage response = await _http.GetAsync($"{videoUrl}");
+        if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
+        {
+            exists = true;
+        }
+        else exists = false;
+        StateHasChanged();
+        return false;
+    }
+    string videoUrl = $"https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/bandymas.txt";
+    Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+    VideoState videoState = new();
+    Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
+    BlazoredVideo video;
+
+    protected override void OnInitialized()
+    {
+        foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
+        {
+            if (item != VideoEvents.NotSet)
+            {
+                eventCounter[item] = 0;
+            }
+        }
+        options[VideoEvents.TimeUpdate] = new VideoStateOptions { CurrentTime = true };
+    }
+
+    double[] arr = { 3.0, 6.0, 9.0 };
+    double currentStopTime = 0;
+
+    void StartPlayingVid()
+    {
+        if (arr[arr.Length - 1] < videoState.CurrentTime)    //jei didziausias laikas jau praejo...
+        {
+            currentStopTime = 99999;
+            PlayVid();
+        }
+        else
+        {
+            for (int i = 0; i < arr.Length - 1; i++)
+            {
+                currentStopTime = arr[i];
+                if (currentStopTime > videoState.CurrentTime) break;
+                currentStopTime = arr[arr.Length - 1];
+            }
+            Console.WriteLine("Current time: " + videoState.CurrentTime);
+            Console.WriteLine("Will stop at: " + currentStopTime);
+            PlayVid();
+        }
+    }
+
+    void PlayVid()
+    {
+        video.StartPlayback();
+    }
+
+    void StopVid()
+    {
+        video.PausePlayback();
+    }
+
+    void OnEvent(VideoState state)
+    {
+        videoState = state;
+        if (state.CurrentTime > currentStopTime)
+        {
+            StopVid();
+        }
+        eventCounter[VideoEvents.TimeUpdate]++;
     }
 }

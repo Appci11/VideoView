@@ -1,20 +1,24 @@
 ﻿@page "/workspace/{CategoryId}/{ProjectId}"
 @using System.Xml.Linq;
 @using System.Text;
+@using Newtonsoft.Json;
 @using VideoView.Models;
 @using VideoView.Models.StoryScriptParts;
 @using VideoView.Pages.Workspace.StoryTabsContent
 
 @inject IJSRuntime JSRuntime
 @inject IWorkspaceService _workspaceService
+@inject ILocalStorageService _localStorage
+@inject HttpClient _http
 
 @if (loaded)
 {
-    <h3>@_workspaceService.CategoryName >> @_workspaceService.projectName 
-    <button @onclick="SaveChanges" class="btn btn-primary">Save changes</button>
-    <button @onclick="DownloadFile" class="btn btn-primary">Download .xml</button>
+    <h3>
+        @_workspaceService.CategoryName >> @_workspaceService.projectName
+        <button @onclick="SaveChanges" class="btn btn-primary">Save changes</button>
+        <button @onclick="DownloadFile" class="btn btn-primary">Download .xml</button>
     </h3>
-@*
+    @*
     <label for="name">Name</label>
     <InputText id="name" @bind-Value="_workspaceService.WorkClass.name"></InputText>
 *@
@@ -45,7 +49,30 @@ else
     {
         await _workspaceService.GetProjectData(CategoryId!, ProjectId!);
         work = _workspaceService.WorkClass;
+        _workspaceService.VideoUrl = await CreateVideoUrl();
         loaded = true;
+    }
+
+    async Task<string> CreateVideoUrl()
+    {
+        string uId = await _localStorage.GetItemAsync<string>("userId");
+        string videoUrl = $"https://firebasestorage.googleapis.com/v0/b/rolka-videosmth.appspot.com/o/users%2F{uId}%2F{CategoryId}%2F{ProjectId}%2Fvideos%2Fvideo1.mp4";
+        var response = await _http.GetAsync(videoUrl);
+        if (response.IsSuccessStatusCode)
+        {
+            try
+            {
+                var jsonString = response.Content.ReadAsStringAsync().Result;
+                FileUploadResponse resp = JsonConvert.DeserializeObject<FileUploadResponse>(jsonString);
+                _workspaceService.VideoToken = resp.downloadTokens;
+            }
+            catch { }
+        }
+        //if (response != null && response.downloadTokens.Length > 0)
+        //{
+        //    _workspaceService.VideoToken = response.downloadTokens;
+        //}
+        return videoUrl;
     }
 
     void SaveChanges()
@@ -69,7 +96,7 @@ else
             AddNodeToRoot(xmlDocument, element);
         }
 
-        foreach(StoryMenuPart item in _workspaceService.WorkClass.StoryScript.StoryMenuParts)
+        foreach (StoryMenuPart item in _workspaceService.WorkClass.StoryScript.StoryMenuParts)
         {
             XElement element = CreateStoryMenuPartElement(item);
             AddNodeToRoot(xmlDocument, element);

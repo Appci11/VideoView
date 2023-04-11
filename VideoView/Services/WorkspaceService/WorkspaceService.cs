@@ -20,6 +20,8 @@ namespace VideoView.Services.WorkspaceService
         public string projectName { get; set; } = string.Empty;
         public Project Project { get; set; } = new Project();
         public WorkClass WorkClass { get; set; } = new WorkClass();
+        public string VideoUrl { get; set; } = string.Empty;
+        public string VideoToken { get; set;} = string.Empty;
 
         public WorkspaceService(ICategoriesService categoriesService, IProjectsService projectsService)
         {
