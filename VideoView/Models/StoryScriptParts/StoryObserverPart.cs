@@ -8,10 +8,18 @@
         public bool ShowDetails { get; set; }
     }
 
-    public class Period
+    public class Period : IComparable<Period>
     {
         public double Time { get; set; }
         public bool Done { get; set; } = false;
         public string Exec { get; set; } = string.Empty;
+
+        public int CompareTo(Period? obj)
+        {
+            if (obj == null) return 1;
+            if (Time > obj.Time) return 1;
+            if (obj.Time == Time) return 0;
+            return -1;
+        }
     }
 }

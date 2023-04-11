@@ -8,20 +8,6 @@
 
 <body>
     <h3>Login</h3>
-
-@*    <EditForm Model="user" OnSubmit="HandleLogin">
-        <div>
-            <InputText id="email" @bind-Value="user.email" type="email" />
-            <label for="email">Email</label>
-        </div>
-        <div>
-            <InputText id="password" @bind-Value="user.password" type="password" />
-            <label for="password">Password</label>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </div>
-    </EditForm>*@
     <MudItem xs="12" sm="7" Style="padding-bottom:5px;">
         <EditForm Model="@user" OnValidSubmit="HandleLogin">
             <MudTextField @bind-Value="user.email" T="string" Label="E-mail" Required="true" @ref="focusTarget" />

@@ -7,30 +7,6 @@
 
 <body>
     <h3>Registration</h3>
-@*
-    <EditForm Model="user" OnSubmit="HandleRegister">
-        <div>
-            <InputText id="email" @bind-Value="user.email" type="email" />
-            <label for="email">Email</label>
-        </div>
-        <div>
-            <InputText id="password" @bind-Value="user.password" type="password" />
-            <label for="password">Password</label>
-        </div>
-        <div>
-            <InputText id="password2" @bind-Value="Pass2" type="password" />
-            <label for="password2">Repeat Password</label>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </div>
-    </EditForm>
-    <br />
-    <p style="color: red">@ErrorMsg</p>
-    <br />
-*@
-
-
     <MudItem xs="12" sm="7" Style="padding-bottom:5px;">
         <EditForm Model="@user" OnValidSubmit="HandleRegister">
             <MudTextField @bind-Value="user.email" T="string" Label="E-mail" Required="true" @ref="focusTarget" />
@@ -50,7 +26,6 @@
 
 @code {
     AuthUserDto user = new AuthUserDto();
-    //private InputText? inputTextForFocus;
     private string ErrorMsg = string.Empty;
     private string Pass2 = string.Empty;
     MudTextField<string> focusTarget;
@@ -58,8 +33,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            //if (inputTextForFocus?.Element != null)
-                await focusTarget.FocusAsync();
+            await focusTarget.FocusAsync();
     }
 
     async Task HandleRegister()
