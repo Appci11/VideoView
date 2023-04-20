@@ -1,67 +1,6 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
-@*
-<div class="grid-container">
-    <!-- LEFT SIDE -->
-    <div>
-        <h2>Story Menu Part (@storymenupart.Title)</h2>
-        <div>
-            <label for="title">Title (node tag value in .xml)</label>
-            <InputText id="title" @bind-Value="storymenupart.Title" class="form-control" style="max-width:300px;"></InputText>
-        </div>
-        <div>
-            <label>
-                Language(name in .xml)
-                <InputSelect @bind-Value="storymenupart.Name" class="form-select" style="min-width:300px;">
-                    <option value="en">English</option>
-                    <option value="lt">Lithuanian</option>
-                </InputSelect>
-            </label>
-        </div>
-        <hr />
-        <h4>Menus</h4>
-        @foreach (var item in storymenupart.Menus)
-        {
-            <div>
-                <label for="text">Text</label>
-                <InputText id="text" @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
-                <button @onclick="() => RemoveStoryMenuPart(item)" class="btn btn-danger">Remove</button>
-            </div>
-            <div>
-                <label>ox</label><br>
-                <InputNumber @bind-Value="item.OX" class="form-control" style="max-width:300px"></InputNumber>
-            </div>
-            <div>
-                <label>oy</label><br>
-                <InputNumber @bind-Value="item.OY" class="form-control" style="max-width:300px"></InputNumber>
-            </div>
-            <div>
-                <label for="action">Action</label>
-                <InputText id="action" @bind-Value="item.Action" class="form-control" style="max-width:300px;"></InputText>
-            </div>
-        }
-        <br />
-        <button @onclick="AddStoryMenuPart" class="btn btn-primary">Add More Menus</button>
-        <br />
-        <br />
-        <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Story Menu Part With Current Data</button>
-        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
-        <br />
-        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Menu Part</button>
-    </div>
-    <!-- RIGHT SIDE -->
-    <div>
-        @foreach(var item in _workspaceService.WorkClass.StoryScript.StoryMenuParts)
-        {
-            <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
-            <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
-            <br />
-        }
-    </div>
-</div>
-*@
-
 <MudTable Items="_workspaceService.WorkClass.StoryScript.StoryMenuParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
         <col style="width:200px;" />
@@ -115,7 +54,7 @@
                         <RowTemplate>
                             <MudTd><MudIconButton OnClick="@(() => RemoveMenu(context, MenuContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
                             <MudTd DataLabel="OX">@MenuContext.OX</MudTd>
-                            <MudTd DataLabel="OY">@MenuContext.OX</MudTd>
+                            <MudTd DataLabel="OY">@MenuContext.OY</MudTd>
                             <MudTd DataLabel="Text">@MenuContext.Text</MudTd>
                             <MudTd DataLabel="Action">@MenuContext.Action</MudTd>
                         </RowTemplate>

@@ -1,125 +1,6 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
-@*
-<div class="grid-container">
-    <!-- LEFT SIDE -->
-    <div>
-        <h2>Quiz Part (@quizpart.Title)</h2>
-        <div>
-            <label for="title">Title (node tag velue in .xml)</label>
-            <InputText id="title" @bind-Value="quizpart.Title" class="form-control" style="max-width:300px;"></InputText>
-        </div>
-        <div>
-            <label>
-                Language(name in .xml)
-                <InputSelect @bind-Value="quizpart.Name" class="form-select" style="min-width:300px;">
-                    <option value="en">English</option>
-                    <option value="lt">Lithuanian</option>
-                </InputSelect>
-            </label>
-        </div>
-        <div>
-            <label>Nr</label><br>
-            <InputNumber @bind-Value="quizpart.Nr" class="form-control" style="max-width:300px"></InputNumber>
-        </div>
-        <div>
-            <label>Correct Nr</label><br>
-            <InputNumber @bind-Value="quizpart.CorrectNr" class="form-control" style="max-width:300px"></InputNumber>
-        </div>
-*@
-@*
-        <br />
-        <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
-*@
-@*        <hr />
-        <h4>Quiz options to pick</h4>
-        @foreach (var item in quizpart.Options)
-        {
-            <div>
-                <label>ox</label><br>
-                <InputNumber @bind-Value="item.OX" class="form-control" style="max-width:300px"></InputNumber>
-                <button @onclick="() => RemoveQuizOption(item)" class="btn btn-danger">Remove</button>
-            </div>
-            <div>
-                <label>oy</label><br>
-                <InputNumber @bind-Value="item.OY" class="form-control" style="max-width:300px"></InputNumber>
-            </div>
-            <div>
-                <label for="text">Quiz question text</label>
-                <InputText id="text" @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
-            </div>
-            <div>
-                <label>
-                    Is current option correct
-                    <InputSelect @bind-Value="item.IsTrue" class="form-select" style="min-width:300px;">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </InputSelect>
-                </label>
-            </div>
-            <div>
-                <label for="answer">Answer on selecting current option</label>
-                <InputText id="answer" @bind-Value="item.Answer" class="form-control" style="max-width:300px;"></InputText>
-            </div>
-            <div>
-                <label>Wait time</label><br>
-                <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
-            </div>
-            <label>
-                Speech
-                <InputText @bind-Value="item.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
-               *@
-@*<i>in .xml @item.Speech</i>*@
-@*
-            </label>
-*@
-@*
-            <label>
-                Speech (base uri + .mp3 audio file name)
-                <InputText @bind-Value="item.Mp3BaseUri" placeholder="Base uri (can be empty)" class="form-control" style="max-width:300px"></InputText>
-                <InputSelect @bind-Value="item.Mp3FileName" class="form-select" style="max-width:300px;">
-                    @if (_workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames.Count > 0)
-                    {
-                        <option value="" disabled default hidden>Previous files found</option>
-                        @foreach (string name in _workspaceService.WorkClass.StoryScript.QuizPartsAudioFileNames)
-                        {
-                            <option value="@name">@name</option>
-                        }
-                        <option value="">None</option>
-                    }
-                    else
-                    {
-                        <option value="" disabled default hidden>Choose files (can be skipped)</option>
-                    }
-                </InputSelect>
-                <i>in .xml @item.Speech</i>
-            </label>
-*@
-@*
-        }
-        <br />
-        <br />
-        <button @onclick="AddQuizOption" class="btn btn-primary">More Options</button>
-        <br />
-        <br />
-        <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Quiz Part With Current Data</button>
-        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
-        <br />
-        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Quiz Part</button>
-    </div>
-    <!-- RIGHT SIDE -->
-    <div>
-        @foreach (var item in _workspaceService.WorkClass.StoryScript.QuizParts)
-        {
-            <a @onclick="(() => LoadSelected(item))" style="cursor:pointer;">@item.Title</a>
-            <a @onclick="(() => RemoveSelected(item))" style="cursor:pointer; color:red;">remove</a>
-            <br />
-        }
-    </div>
-</div>
-*@
-
 <MudTable Items="_workspaceService.WorkClass.StoryScript.QuizParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
         <col style="width:220px;" />
@@ -192,7 +73,7 @@
                         <RowTemplate>
                             <MudTd><MudIconButton OnClick="@(() => RemoveOption(context, QuizContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
                             <MudTd DataLabel="OX">@QuizContext.OX</MudTd>
-                            <MudTd DataLabel="OY">@QuizContext.OX</MudTd>
+                            <MudTd DataLabel="OY">@QuizContext.OY</MudTd>
                             <MudTd DataLabel="Wait">@QuizContext.Wait</MudTd>
                             <MudTd DataLabel="Is True">@QuizContext.IsTrue</MudTd>
                             <MudTd DataLabel="Text">@QuizContext.Text</MudTd>
