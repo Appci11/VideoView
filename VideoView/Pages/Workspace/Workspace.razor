@@ -84,6 +84,29 @@ else
     {
         XDocument xmlDocument = CreateXmlFile();
 
+        // Adding unique parts of xml
+        xmlDocument.Root.Add(Part1());
+        xmlDocument.Root.Add(Part2());
+        xmlDocument.Root.Add(Part3());
+
+        foreach (StoryObserverPart item in _workspaceService.WorkClass.StoryScript.StoryObserverParts)
+        {
+            int nr = 1;
+            foreach (var item2 in item.Periods)
+            {
+                xmlDocument.Root.Add(StoryInteruptedPart(item2.Exec, item2.Time, nr++));
+            }
+        }
+
+        xmlDocument.Root.Add(PlayStoryInitialPart());
+        // neiseina ciklo daryt, nes reikia atskirai pasirinkt reikia "tween" ar ne
+        xmlDocument.Root.Add(PlayStoryPart(1, true, "play_story_seintro_3();"));
+        xmlDocument.Root.Add(PlayStoryPart(2, false, "play_story_seintro_4();"));
+        xmlDocument.Root.Add(PlayStoryPart(3, false, "play_story_seintro_5();"));
+        xmlDocument.Root.Add(PlayStoryPart(4, true, "story_algo_finish();"));
+        xmlDocument.Root.Add(StoryAlgoFinishPart());
+
+
         foreach (StoryPart item in _workspaceService.WorkClass.StoryScript.StoryParts)
         {
             XElement element = CreateStoryPartElement(item);
@@ -109,7 +132,7 @@ else
         }
 
         //Console.WriteLine(xmlDocument.ToString());
-        await JSRuntime.InvokeAsync<object>("saveFile", "FailoVardas.xml", xmlDocument.ToString());
+        await JSRuntime.InvokeAsync<object>("saveFile", "storyscript_created.xml", xmlDocument.ToString());
     }
     static XDocument CreateXmlFile()
     {
@@ -163,7 +186,7 @@ else
             if (o.Speech != null && o.Speech.Length > 3)
             {
                 elements.Add(new XElement("option",
-                                new XAttribute("name", $"o{i}"),
+                                new XAttribute("name", $"o{i++}"),
                                 new XAttribute("ox", o.OX),
                                 new XAttribute("oy", o.OY),
                                 new XAttribute("text", o.Text),
@@ -175,7 +198,7 @@ else
             else
             {
                 elements.Add(new XElement("option",
-                                new XAttribute("name", $"o{i}"),
+                                new XAttribute("name", $"o{i++}"),
                                 new XAttribute("ox", o.OX),
                                 new XAttribute("oy", o.OY),
                                 new XAttribute("text", o.Text),
@@ -197,7 +220,7 @@ else
         int i = 1;
         foreach (Menu m in storyMenuPart.Menus)
         {
-            elements.Add(new XElement("manu",
+            elements.Add(new XElement("menu",
                             new XAttribute("name", $"m{i++}"),
                             new XAttribute("text", m.Text),
                             new XAttribute("ox", m.OX),
@@ -216,11 +239,12 @@ else
         int i = 1;
         foreach (Period p in storyObserverPart.Periods)
         {
-            elements.Add(new XElement("manu",
+            elements.Add(new XElement("period",
                             new XAttribute("name", $"p{i++}"),
                             new XAttribute("time", p.Time),
                             new XAttribute("done", p.Done),
-                            new XAttribute("exec", p.Exec)));
+                            new XAttribute("exec", $"play_{p.Exec}();")));
+                            //new XAttribute("exec", p.Exec)));
         }
         elem.Add(elements);
         return elem;
@@ -229,5 +253,133 @@ else
     static void AddNodeToRoot(XDocument doc, XElement elem)
     {
         doc.Root.Add(elem);
+    }
+
+    // likusio, nesikartojanciu failo daliu formavimas
+
+    static XElement Part1()
+    {
+
+        var elem = new XElement("story_answer");
+        var att = new XAttribute("name", "lt");
+        elem.Add(att);
+        var elem2 = new XElement("talk");
+        elem2.Add(new XAttribute("name", "t1"));
+        elem2.Add(new XAttribute("text", ""));
+        elem2.Add(new XAttribute("wait", "4"));
+        elem.Add(elem2);
+        return elem;
+    }
+
+    static XElement Part2()
+    {
+        var elem = new XElement("action");
+        var att = new XAttribute("name", "play_story");
+        elem.Add(att);
+        elem.Add("\n    start_observing_video();");
+        elem.Add("\n    play_story_seintro();\n  ");
+        return elem;
+    }
+
+    static XElement Part3()
+    {
+        var elem = new XElement("story_video");
+        var att = new XAttribute("src", "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+        elem.Add(att);
+        return elem;
+    }
+
+    static XElement StoryInteruptedPart(string functionToCall, double time, int nr)
+    {
+        var elem = new XElement("action");
+        string functionName = "play_" + functionToCall;
+        var att = new XAttribute("name", functionName);
+        elem.Add(att);
+        elem.Add("\n    pause_video();");
+        elem.Add("\n    tween(plugin[pp_light].lights, 0, 1, easeinoutback);");
+        elem.Add("\n    hide_story_text();");
+        elem.Add("\n    move_eye(0, 0, 1.5);");
+        elem.Add($"\n    copy(playback_object, {functionToCall}[get(global.language)]);");
+        elem.Add("\n    hide_video();");
+        elem.Add("\n    delayedcall(d25, 1.6,");
+        elem.Add("\n      set_story_playback_positions();");
+        elem.Add("\n      playback_story_speech();");
+        elem.Add("\n      add(delay_sum, get(delay_sum), 0.1);");
+        elem.Add("\n      delayedcall(d26, get(delay_sum),");
+        elem.Add($"\n        set(proceed_action, \"hide_picture_thumb(); show_video(); resume_story_video({time});\");");
+        elem.Add($"\n        copy(quiz_object, quiz_intro_{nr}[get(global.language)]);");
+        elem.Add("\n        set(quiz_picture, \"quizimages/course1/algorithms.jpg\");");
+        elem.Add("\n        show_picture_thumb(get(quiz_picture));");
+        elem.Add("\n        play_quiz();");
+        elem.Add("\n      );");
+        elem.Add("\n    );\n  ");
+        return elem;
+    }
+
+    static XElement PlayStoryInitialPart()
+    {
+        var elem = new XElement("action");
+        elem.Add(new XAttribute("name", "play_story_seintro"));
+        elem.Add("\n    hide_story_selection();");
+        elem.Add("\n    hide_story_text();");
+        elem.Add("\n    delayedcall(d21, 2, move_eye(10, -10, 1.5););");
+        elem.Add("\n    copy(playback_object, story_intro_intro[get(global.language)]);");
+        elem.Add("\n    delayedcall(d22, 3.6,");
+        elem.Add("\n      set_story_playback_positions();");
+        elem.Add("\n      playback_story_speech();");
+        elem.Add("\n      add(delay_sum, get(delay_sum), 0.1);");
+        elem.Add("\n      delayedcall(d23, get(delay_sum), hide_story_text(); move_eye(50, -30, 1.5););");
+        elem.Add("\n      add(delay_sum, get(delay_sum), 1.6);");
+        elem.Add("\n      delayedcall(d24, get(delay_sum),");
+        elem.Add("\n        set(proceed_action, \"play_story_seintro_2(); \");");
+        elem.Add("\n        set(video_to_play, get(story_video.src));");
+        elem.Add("\n        tween(plugin[pp_light].lights, -1, 1, easeinoutback);");
+        elem.Add("\n        play_story_video();");
+        elem.Add("\n        set(menu_enabled, true);");
+        elem.Add("\n      );");
+        elem.Add("\n    );\n  ");
+        return elem;
+    }
+
+    static XElement PlayStoryPart(int nr, bool tween, string nextAction)
+    {
+        var elem = new XElement("action");
+        elem.Add(new XAttribute("name", $"play_story_seintro_{nr + 1}"));
+        if (tween)
+        {
+            elem.Add("\n    tween(plugin[pp_light].lights, 0, 1, easeinoutback);");
+        }
+        elem.Add("\n    hide_story_text();");
+        elem.Add("\n    move_eye(0, 0, 1.5);");
+        elem.Add($"\n    copy(playback_object, story_intro_quiz_{nr}[get(global.language)]);");
+        elem.Add("\n    delayedcall(d25, 1.6,");
+        elem.Add("\n      set_story_playback_positions();");
+        elem.Add("\n      playback_story_speech();");
+        elem.Add("\n      add(delay_sum, get(delay_sum), 0.1);");
+        elem.Add("\n      delayedcall(d26, get(delay_sum), ");
+        elem.Add($"\n        set(proceed_action, \"{nextAction}\");");
+        elem.Add($"\n        copy(quiz_object, quiz_intro_{nr}[get(global.language)]);");
+        elem.Add("\n        set(quiz_picture, \"quizimages/course1/algorithms.jpg\");");
+        elem.Add("\n        show_picture_thumb(get(quiz_picture));");
+        elem.Add("\n        play_quiz();");
+        elem.Add("\n      );");
+        elem.Add("\n    );\n  ");
+        return elem;
+    }
+
+    static XElement StoryAlgoFinishPart()
+    {
+        var elem = new XElement("action");
+        elem.Add(new XAttribute("name", "story_algo_finish"));
+        elem.Add("\n    js(setScore(););");
+        elem.Add("\n    hide_story_text();");
+        elem.Add("\n    copy(playback_object, story_intro_finish[get(global.language)]);");
+        elem.Add("\n    delayedcall(d81, 3.6,");
+        elem.Add("\n      set_story_playback_positions();");
+        elem.Add("\n      playback_story_speech();");
+        elem.Add("\n      add(delay_sum, get(delay_sum), 0.1);");
+        elem.Add("\n      delayedcall(d82, get(delay_sum), cancel_story(); );");
+        elem.Add("\n      );\n  ");
+        return elem;
     }
 }

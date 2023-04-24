@@ -1,94 +1,6 @@
 ﻿@using VideoView.Models.StoryScriptParts
 @inject IWorkspaceService _workspaceService
 
-@*
-<div class="grid-container">
-    <!-- LEFT SIDE -->
-    <div>
-        <h2>Story Part (@storypart.Title)</h2>
-        <div>
-            <label for="title">Title (node tag value in .xml)</label>
-            <InputText id="title" @bind-Value="storypart.Title" class="form-control" style="max-width:300px"></InputText>
-        </div>
-        <div>
-            <label>
-                Language (name in .xml)
-                <InputSelect @bind-Value="storypart.Name" class="form-select" style="min-width:300px;">
-                    <option value="en">English</option>
-                    <option value="lt">Lithuanian</option>
-                </InputSelect>
-            </label>
-        </div>
-        <div>
-            <label>
-                Speech
-                <InputText @bind-Value="storypart.Speech" placeholder="Speech" class="form-control" style="max-width:300px"></InputText>
-            </label>
-        </div>
-*@
-@*
-        <div>
-        <label>
-        Speech (base uri + .mp3 audio file name)
-        <InputText @bind-Value="mp3BaseUriProperty" placeholder="Base uri" class="form-control" style="max-width:300px"></InputText>
-        <InputSelect @bind-Value="mp3FileNameProperty" class="form-select" style="max-width:300px;">
-        @if (_workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames.Count > 0)
-        {
-        <option value="" disabled default hidden>Previous files found</option>
-        @foreach (string name in _workspaceService.WorkClass.StoryScript.StoryPartsAudioFileNames)
-        {
-        <option value="@name">@name</option>
-        }
-        <option value="">None</option>
-        }
-        else
-        {
-        <option value="" disabled default hidden>Choose files</option>
-        }
-        </InputSelect>
-        </label>
-        <br />
-        <i>in .xml @storypart.Speech</i>
-        </div>
-        *@
-@*
-        <br />
-        <InputFile OnChange="@LoadMp3FileNames" multiple>Upload audio files</InputFile>
-        *@
-@*        <hr />
-        <h4>Talking Points</h4>
-        @foreach (var item in storypart.Talks)
-        {
-            <div>
-                <label>Text</label><br>
-                <InputText @bind-Value="item.Text" class="form-control" style="max-width:300px;"></InputText>
-                <button @onclick="() => RemoveTalkingPoint(item)" class="btn btn-danger">Remove</button>
-            </div>
-            <div>
-                <label>Speech (time)</label><br>
-                <InputNumber @bind-Value="item.Wait" class="form-control" style="max-width:300px"></InputNumber>
-            </div>
-        }
-        <br />
-        <button @onclick="AddTalkingPoint" class="btn btn-primary">More Talking Points</button>
-        <br />
-        <br />
-        <button @onclick="HandleSubmit" type="submit" class="btn btn-primary">Add New Story Part With Current Data</button>
-        <InputCheckbox @bind-Value="clearOnSubmit" /> <label>Clear on submit</label>
-        <br />
-        <button disabled="@editDisable" @onclick="EditCurrentlySelected" class="btn btn-primary">Update Selected Story Part</button>
-    </div>
-    <!-- RIGHT SIDE -->
-    <div>
-        @foreach (var item in _workspaceService.WorkClass.StoryScript.StoryParts)
-        {
-            <a style="cursor:pointer;" @onclick="(() => LoadSelected(item))">@item.Title</a>
-            <a style="cursor:pointer; color:red;" @onclick="(() => RemoveSelected(item))">remove</a>
-            <br />
-        }
-    </div>
-</div>
-*@
 
 <MudTable Items="_workspaceService.WorkClass.StoryScript.StoryParts" Dense="true" RowStyle="background-color:#F6F6F6">
     <ColGroup>
@@ -141,7 +53,7 @@
                                 <HeaderContent>
                                     <MudTh><MudIconButton OnClick="@(() => AddNewTalk(context))" Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" /></MudTh>
                                     <MudTh>Wait Time</MudTh>
-                                    <MudTh>Name</MudTh>
+                                    <MudTh>Text</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
                                     <MudTd><MudIconButton OnClick="@(() => RemoveTalk(context, TalksContext))" Icon="@Icons.Material.Filled.RemoveCircleOutline" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" /></MudTd>
@@ -339,7 +251,7 @@
     {
         try
         {
-            _workspaceService.WorkClass.StoryScript.StoryParts.FirstOrDefault(sp).Talks.Remove(t);
+            sp.Talks.Remove(t);
         }
         catch { }
     }

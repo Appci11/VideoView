@@ -276,7 +276,7 @@
     {
         try
         {
-            _workspaceService.WorkClass.StoryScript.QuizParts.FirstOrDefault(qp).Options.Remove(o);
+            qp.Options.Remove(o);
         }
         catch { }
     }
