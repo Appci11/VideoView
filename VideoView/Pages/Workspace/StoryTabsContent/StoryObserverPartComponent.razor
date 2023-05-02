@@ -282,6 +282,7 @@
     {
         StoryObserverPart part = new StoryObserverPart { Title = "story_observer" };
         Period period = new Period();
+        period.Exec = "story_intro_quiz_interrupted_1";
         part.Periods.Add(period);
         _workspaceService.WorkClass.StoryScript.StoryObserverParts.Add(part);
         await Notify.InvokeAsync();
@@ -295,7 +296,9 @@
 
     void AddNewPeriod(StoryObserverPart sop)
     {
-        sop.Periods.Add(new Period());
+        Period temp = new Period();
+        temp.Exec = "story_intro_quiz_interrupted_" + (_workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Count + 1);
+        sop.Periods.Add(temp);
     }
 
     private void AddNewPeriodFromVideo()
