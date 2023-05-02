@@ -254,7 +254,7 @@
 
     async void AddNewQuizPart()
     {
-        QuizPart part = new QuizPart { Title = "quiz_part_" };
+        QuizPart part = new QuizPart { Title = "quiz_intro_" + (_workspaceService.WorkClass.StoryScript.QuizParts.Count + 1) };
         Option option = new Option();
         part.Options.Add(option);
         _workspaceService.WorkClass.StoryScript.QuizParts.Add(part);

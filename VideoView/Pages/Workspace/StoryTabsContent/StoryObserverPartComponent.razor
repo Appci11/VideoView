@@ -178,7 +178,7 @@
         {
             _workspaceService.VideoToken = resp.downloadTokens;
         }
-        catch{}
+        catch { }
         vidLoaded = true;
         StateHasChanged();
     }
@@ -309,7 +309,11 @@
             sk = videoState.CurrentTime;
         }
         else sk = 0;
-        _workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Add(new Period { Time = Math.Round(sk, 2, MidpointRounding.AwayFromZero) });
+        _workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Add(new Period
+            {
+                Time = Math.Round(sk, 2, MidpointRounding.AwayFromZero),
+                Exec = "story_intro_quiz_interrupted_" + (_workspaceService.WorkClass.StoryScript.StoryObserverParts[0].Periods.Count + 1)
+            });
     }
 
     void RemovePeriod(StoryObserverPart sop, Period p)
